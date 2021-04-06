@@ -613,3 +613,28 @@ void Utils::Clip1DArray(double array[], unsigned int columnCount, Boundaries bou
 		}
 	}
 }
+
+void Utils::sortArr(double array[], int n, std::vector<int> &Ind_Salp_Ordenado)
+{
+	std::vector<std::pair<double, int> > vp;
+	// Inserting element in pair vector
+	// to keep track of previous indexes
+	for (int i = 0; i < n; ++i) 
+	{
+		vp.push_back(std::make_pair(array[i], i));
+	}
+
+	// Sorting pair vector
+	sort(vp.begin(), vp.end());
+
+	// Displaying sorted element
+	// with previous indexes
+	// corresponding to each element
+	
+	for (int i = 0; i < vp.size(); i++)
+	{
+
+		array[i] = vp[i].first;
+		Ind_Salp_Ordenado[i] = vp[i].second;
+	}
+}

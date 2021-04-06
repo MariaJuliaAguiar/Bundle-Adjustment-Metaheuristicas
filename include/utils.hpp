@@ -20,6 +20,7 @@ public:
 	static double** Create2DZeroArray(int search_agents, int dimension);
 	static double* Create1DArray(unsigned int columnCount);
 	static void Clip1DArray(double array[], unsigned int columnCount, Boundaries boundaries[]);
+	static void sortArr(double array[], int n, std::vector<int> &Ind_Salp_Ordenado);
 };
 
 #endif
