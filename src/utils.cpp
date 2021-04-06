@@ -11,7 +11,7 @@ Utils *utils = nullptr;
 // Função para encontrar a posição vinda do robo que sera necessaria para encontrar o chute inicial e os limites dos parametros
 std::vector<std::vector<float>>  Utils::lerSFM(std::string pasta, double &fx, double &fy, double &cx, double &cy, std::vector<std::string> &imagens_src) {
 
-	std::string arquivo_sfm = pasta+"cameras.sfm";
+	std::string arquivo_sfm = pasta + "cameras.sfm";
 
 	std::ifstream sfm(arquivo_sfm);
 	int contador_linhas = 1;
@@ -64,7 +64,7 @@ std::vector<std::vector<float>>  Utils::lerSFM(std::string pasta, double &fx, do
 }
 
 // Função para encontrar os limites maximos e minimos dos parâmetros
-void Utils::uplowerBound( std::vector<std::vector<float> > pose, double fx, double fy, double cx, double cy, std::vector<double> &lb, std::vector<double> &up)
+void Utils::uplowerBound(std::vector<std::vector<float> > pose, double fx, double fy, double cx, double cy, std::vector<double> &lb, std::vector<double> &up)
 {
 
 	for (int j = 0; j < pose.size(); j++)
@@ -214,7 +214,7 @@ void Utils::calcular_features_sift(std::vector<cv::Mat>  &descp_src, std::vector
 
 		// Ler a imagem inicial
 		cv::Mat imsrc = cv::imread(imagens_src[i], cv::IMREAD_COLOR);
-		
+
 		// Descritores SIFT calculados
 		cv::Ptr<cv::xfeatures2d::SIFT> sift = cv::xfeatures2d::SIFT::create();
 
@@ -232,12 +232,12 @@ void Utils::calcular_features_sift(std::vector<cv::Mat>  &descp_src, std::vector
 				dsrc.at<float>(i, j) = sqrt(dsrc.at<float>(i, j) / (dsrcsum.at<float>(i, 0) + std::numeric_limits<float>::epsilon()));
 			}
 		}
-		
+
 		kpts_src[i] = kpsrc;
 		// Salvando no vetor de cada um os descritores
 		descp_src[i] = dsrc;
 
-		
+
 	}
 }
 void Utils::filtrar_matches_keypoints_repetidos(std::vector<cv::KeyPoint> &kt, std::vector<cv::KeyPoint> &ks, std::vector<cv::DMatch> &m) {
@@ -325,15 +325,12 @@ std::vector<std::vector<std::vector<cv::KeyPoint>>> Utils::sift_matches_matrix_e
 	cv::Ptr<cv::DescriptorMatcher> matcher;
 	matcher = cv::DescriptorMatcher::create(cv::DescriptorMatcher::FLANNBASED);
 
-
 	std::vector<std::vector<int>> filter_zero;
 	filter_zero.resize(imagens_src.size());
 	for (int frame0 = 0; frame0 < imagens_src.size(); frame0++) {
 
 		for (int frame1 = 0; frame1 < indices[frame0].size(); frame1++)
 		{
-
-
 			std::vector<std::vector<cv::DMatch>> matches;
 			std::vector<cv::DMatch> good_matches;
 			if (!descp_src[frame0].empty() && !descp_src[indices[frame0][frame1]].empty()) {
@@ -351,25 +348,19 @@ std::vector<std::vector<std::vector<cv::KeyPoint>>> Utils::sift_matches_matrix_e
 				{
 					// Filtrar keypoints repetidos
 					Utils::filtrar_matches_keypoints_repetidos(kpts_src[indices[frame0][frame1]], kpts_src[frame0], good_matches);
-				
 					// Anota quantas venceram nessa combinacao
-					//matches_count(frame0, frame1) = good_matches.size();
 					matriz_matches.at(frame0).at(frame1) = good_matches;
 
 				}
-
 			}
-
-
 		}
-
 	}
 	bool debug = false;
 	std::vector<std::vector<std::vector<cv::KeyPoint>>> bestKey;
 	std::vector<cv::DMatch> best_matches;
 	std::vector<cv::KeyPoint> best_kptgt, best_kpsrc;
 	bestKey.resize(imagens_src.size());
-	
+
 	for (int frame0 = 0; frame0 < imagens_src.size(); frame0++)
 	{
 
@@ -432,11 +423,8 @@ std::vector<std::vector<std::vector<cv::KeyPoint>>> Utils::sift_matches_matrix_e
 				imwrite("C:/dataset3/im_src1.png", im2);
 
 			}
-			
-			int rand0, rand1, rand2;
-			int idi0, idi1, idi2;
-			int idj0, idj1, idj2;
 
+			int rand0, rand1, rand2;
 			std::vector<cv::KeyPoint> best_kptgt_org, best_kpsrc_org;
 			float scale = 0.95;
 			int ncorr = best_kpsrc.size();
@@ -509,7 +497,7 @@ std::vector<std::vector<std::vector<cv::KeyPoint>>> Utils::sift_matches_matrix_e
 			std::iota(std::begin(v), std::end(v), 0); // Fill with 0, 1, ..., 99.
 			//std::random_shuffle(v.begin(), v.end());
 			int t = best_kpsrc_org.size();
-						
+
 			t = (t < 50) ? t : 50;
 
 			for (int i = 0; i < t; i++) {
@@ -522,7 +510,6 @@ std::vector<std::vector<std::vector<cv::KeyPoint>>> Utils::sift_matches_matrix_e
 				bestKey[frame0].push_back(best_kptgt);
 			}
 
-	
 			best_kptgt.clear();
 			best_kpsrc.clear();
 			best_kpsrc_org.clear();
@@ -549,38 +536,36 @@ double Utils::GenerateRandomNumber() {
 
 double** Utils::Create2DRandomArray(unsigned int rowCount, unsigned int columnCount, std::vector<double> lb, std::vector<double> up)
 {
-	
+
 	double **array = new double *[rowCount];
 
-	#pragma omp parallel for
-		for (int y = 0; y < rowCount; y++)
-		{
-			array[y] = new double[columnCount];
-			if (y == 0) {
-				for (int x = 0; x < columnCount; x++) {
-	
-					array[y][x] = lb[x]+ 3;
-					array[y][x + 1] = lb[x + 1]+ 3;
-					array[y][x + 2] = lb[x + 2] + 3;
-					array[y][x + 3] = lb[x + 3] + 3;
-					array[y][x + 4] = lb[x + 4] + 3;
-					array[y][x + 5] = lb[x + 5] + 3;
-					x = x + 5;
-	
-					
-				}
-			}
-			else {
-				// randomize data and apply between (lower,upper) bound
-				for (int x = 0; x < columnCount; x++) {
-					array[y][x] = lb[x] + (up[x] - lb[x]) * GenerateRandomNumber();
-	
-					
-				}
+#pragma omp parallel for
+	for (int y = 0; y < rowCount; y++)
+	{
+		array[y] = new double[columnCount];
+		if (y == 0) {
+			for (int x = 0; x < columnCount; x++) {
+
+				array[y][x] = lb[x] + 3;
+				array[y][x + 1] = lb[x + 1] + 3;
+				array[y][x + 2] = lb[x + 2] + 3;
+				array[y][x + 3] = lb[x + 3] + 3;
+				array[y][x + 4] = lb[x + 4] + 3;
+				array[y][x + 5] = lb[x + 5] + 3;
+				x = x + 5;
+
 			}
 		}
-		
-		
+		else {
+			// randomize data and apply between (lower,upper) bound
+			for (int x = 0; x < columnCount; x++) {
+				array[y][x] = lb[x] + (up[x] - lb[x]) * GenerateRandomNumber();
+
+			}
+		}
+	}
+
+
 	return array;
 
 }
@@ -591,19 +576,19 @@ double* Utils::Create1DZeroArray(unsigned int columnCount) {
 	return array;
 }
 void Utils::Clip1DArray(double array[], unsigned int columnCount, Boundaries boundaries[]) {
-	
+
 	for (int column = 0; column < columnCount; column++) {
-	
+
 		double value = array[column];
 		if (value < boundaries[column].lowerBound) {
-	
+
 			array[column] = boundaries[column].lowerBound;
-			
+
 		}
 		if (value > boundaries[column].upperBound) {
-			
+
 			array[column] = boundaries[column].upperBound;
-			
+
 		}
 	}
 }

@@ -41,7 +41,6 @@ int main() {
 	//Localização do arquivo NVM/SFM com posição das imagens de acordo com o PEPO
 	std::string pasta = "C:/Users/julia/Pictures/geradorartesspace/scan3/";
 
-
 	//Encontrando posição originais das imagens (Posição do PEPO)
 	double fx, fy, cx, cy;
 	std::vector<std::string> imagens_src;
@@ -83,13 +82,15 @@ int main() {
 	//Size of final panoramic
 	cv::Mat im360 = cv::Mat::zeros(cv::Size(raios_360, raios_180), CV_8UC3); // Imagem 360 ao final de todas as fotos passadas sem blending 
 
-																			 // Inicialização das varivaeis para otimzação
+ // Inicialização das varivaeis para otimzação
 	int searchAgentsCount_m = 35;// numero de agentes
 	int dimension_m = imagens_src.size() * 6; //  dimensão 
 	int iterations = 1; // número de iterações
 	int simulations = 1;//quantidade de simulações
-	double **positions_inicial = Utils::Create2DRandomArray(searchAgentsCount_m, dimension_m, lb, up);
-	//***************GWO ****************************
+	double **positions_inicial = Utils::Create2DRandomArray(searchAgentsCount_m, dimension_m, lb, up);// posição inicial dos agentes 
+	
+	
+	//**************************** GWO ****************************
 
 	try
 	{
@@ -104,9 +105,6 @@ int main() {
 				<< gwo << std::endl;
 			cout << "";
 		}
-
-
-
 		freeMemory();
 	}
 	catch (GWOException &e) {
@@ -114,6 +112,7 @@ int main() {
 		return EXIT_FAILURE;
 	}
 
+	//**************************** BAT ****************************
 
 
 	return 0;
