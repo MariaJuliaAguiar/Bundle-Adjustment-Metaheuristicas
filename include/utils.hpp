@@ -17,6 +17,8 @@ public:
 	static double **Create2DRandomArray(unsigned int rowCount, unsigned int columnCount, std::vector<double> lb, std::vector<double> up);
 	static double GenerateRandomNumber();
 	static double *Create1DZeroArray(unsigned int columnCount);
+	static double** Create2DZeroArray(int search_agents, int dimension);
+	static double* Create1DArray(unsigned int columnCount);
 	static void Clip1DArray(double array[], unsigned int columnCount, Boundaries boundaries[]);
 };
 

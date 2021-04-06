@@ -71,9 +71,7 @@ void Argument::Parse()
 
 	benchmark_m = BenchmarkFactory::Get()->CreateBenchmark(name,  lb_m,up_m);
 
-	/*	if (benchmark_m == nullptr) {
-			throw GWOException(UNKNOWN_BENCHMARK);
-		}*/
+
 
 }
 

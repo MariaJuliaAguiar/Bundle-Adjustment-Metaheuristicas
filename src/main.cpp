@@ -12,9 +12,12 @@
 #include <vector>
 #include <pcl/io/pcd_io.h>
 #include <pcl/io/ply_io.h>
+//includes meus 
+
 #include "argument.hpp"
 #include "utils.hpp"
 #include "gwo.hpp"
+#include "bat.hpp"
 #include "GWOException.hpp"
 /// Definicoes e namespaces
 
@@ -23,9 +26,10 @@ using namespace std;
 using namespace cv::xfeatures2d;
 using namespace pcl;
 using namespace pcl::io;
+
 Argument *argument = nullptr;
 GWO *gwo = nullptr;
-
+BAT *bat = nullptr;
 void freeMemory() {
 	if (argument) {
 		delete argument;
@@ -34,6 +38,10 @@ void freeMemory() {
 	if (gwo) {
 		delete gwo;
 		gwo = nullptr;
+	}
+	if (bat) {
+		delete bat;
+		bat = nullptr;
 	}
 }
 int main() {
@@ -88,31 +96,53 @@ int main() {
 	int iterations = 1; // número de iterações
 	int simulations = 1;//quantidade de simulações
 	double **positions_inicial = Utils::Create2DRandomArray(searchAgentsCount_m, dimension_m, lb, up);// posição inicial dos agentes 
-	
-	
+
+
 	//**************************** GWO ****************************
 
-	try
+	/*for (int a = 0; a < simulations; a++)
 	{
-		for (int a = 0; a < simulations; a++)
-		{
-			atexit(freeMemory);
-			argument = new Argument(searchAgentsCount_m, iterations, lb, up);
-			argument->Parse();
-			gwo = new GWO(argument->GetBenchmark(), searchAgentsCount_m, iterations, ind_val, positions_inicial);
-			(void)gwo->Evaluate(true, bestKey, imagens_src, im360, indices_vizinhos);
-			std::cout << "Result:" << std::endl
-				<< gwo << std::endl;
-			cout << "";
-		}
-		freeMemory();
+		atexit(freeMemory);
+		argument = new Argument(searchAgentsCount_m, iterations, lb, up);
+		argument->Parse();
+		gwo = new GWO(argument->GetBenchmark(), searchAgentsCount_m, iterations, ind_val, positions_inicial);
+		(void)gwo->Evaluate(true, bestKey, imagens_src, im360, indices_vizinhos);
+		std::cout << "Result GWO:" << std::endl
+			<< gwo << std::endl;
+		cout << "";
 	}
-	catch (GWOException &e) {
-		std::cerr << "Grey wolf optimizer exception : " << e.what() << std::endl;
-		return EXIT_FAILURE;
-	}
+	freeMemory();*/
+
 
 	//**************************** BAT ****************************
+	//parâmetros especificos do Bat
+
+	std::vector<double> taxa(searchAgentsCount_m, 0.0);//taxa de emissão dos pulsos
+	std::vector<double> amp_sonora(searchAgentsCount_m, Utils::GenerateRandomNumber()); // amplitude sonora
+	double lambda = 0.01;
+	double alpha = 0.9995;
+	double gama = 0.0015;
+	double fmax = 100;// frequencia maxima
+	double fmin = 0; //frequencia minima
+	double A0 = 1;//amplitude sonora inicial
+	double rf = 1;//taxa de emissao 
+
+	for (int a = 0; a < simulations; a++)
+	{
+		atexit(freeMemory);
+		argument = new Argument(searchAgentsCount_m, iterations, lb, up);
+		argument->Parse();
+		bat = new BAT(argument->GetBenchmark(), searchAgentsCount_m, iterations, ind_val, amp_sonora, taxa, lambda, alpha, gama, fmax, fmin, A0, rf, positions_inicial);
+		(void)bat->Evaluate(true, bestKey, imagens_src, im360, indices_vizinhos);
+		std::cout << "Result BAT:" << std::endl
+			<< bat << std::endl;
+		cout << "";
+	}
+	freeMemory();
+
+
+
+
 
 
 	return 0;

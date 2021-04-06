@@ -575,6 +575,27 @@ double* Utils::Create1DZeroArray(unsigned int columnCount) {
 	std::fill_n(array, columnCount, 0.0);
 	return array;
 }
+double* Utils::Create1DArray(unsigned int columnCount) {
+	double *array = new double[columnCount];
+	std::fill_n(array, columnCount, std::numeric_limits<double>::infinity());
+	return array;
+}
+double** Utils::Create2DZeroArray(int search_agents,int dimension) {
+	double **zeros_vector = new double *[search_agents];
+#pragma omp parallel for
+	for (int y = 0; y < search_agents; y++)
+	{
+		zeros_vector[y] = new double[dimension];
+
+		for (int x = 0; x < dimension; x++)
+		{
+
+			zeros_vector[y][x] = 0.0;
+
+		}
+	}
+	return zeros_vector;
+}
 void Utils::Clip1DArray(double array[], unsigned int columnCount, Boundaries boundaries[]) {
 
 	for (int column = 0; column < columnCount; column++) {

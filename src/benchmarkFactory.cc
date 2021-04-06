@@ -19,22 +19,9 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "benchmarkFactory.hpp"
-//#include "benchmark/f1.hpp"
-//#include "benchmark/f2.hpp"
-//#include "benchmark/f3.hpp"
-//#include "benchmark/f4.hpp"
-//#include "benchmark/f5.hpp"
-//#include "benchmark/f6.hpp"
-//#include "benchmark/f7.hpp"
 #include "benchmark/fob.hpp"
 BenchmarkFactory::BenchmarkFactory() {
-	//Register("F1", &F1::Create);
-	//Register("F2", &F2::Create);
-	//Register("F3", &F3::Create);
-	//Register("F4", &F4::Create);
-	//Register("F5", &F5::Create);
-	//Register("F6", &F6::Create);
-	//Register("F7", &F7::Create);
+
 	
 	int teste;
 	//Register("fob", &fob::Create);
