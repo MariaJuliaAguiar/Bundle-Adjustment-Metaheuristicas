@@ -39,9 +39,11 @@ BAT::BAT(Benchmark *benchmark, unsigned int searchAgentsCount, unsigned int maxi
 BAT::~BAT() {
 	for (register unsigned int agentId = 0; agentId < searchAgentsCount_m; agentId++) {
 		delete positions_m[agentId];
+		delete vel_m[agentId];
 	}
 
 	delete convergenceCurve_m;
+
 }
 void BAT::calculateFitness(std::vector<std::vector<std::vector<cv::KeyPoint>>> bestKey, std::vector<std::string> imagens_src, cv::Mat im360, int rows, int cols, std::vector<std::vector<int>> indices, double *best_pos, double best_score, int it)
 {

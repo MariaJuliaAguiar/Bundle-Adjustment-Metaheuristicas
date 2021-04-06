@@ -18,6 +18,7 @@
 #include "utils.hpp"
 #include "gwo.hpp"
 #include "bat.hpp"
+#include "AOA.hpp"
 #include "GWOException.hpp"
 /// Definicoes e namespaces
 
@@ -30,6 +31,8 @@ using namespace pcl::io;
 Argument *argument = nullptr;
 GWO *gwo = nullptr;
 BAT *bat = nullptr;
+AOA *aoa = nullptr;
+
 void freeMemory() {
 	if (argument) {
 		delete argument;
@@ -90,17 +93,18 @@ int main() {
 	//Size of final panoramic
 	cv::Mat im360 = cv::Mat::zeros(cv::Size(raios_360, raios_180), CV_8UC3); // Imagem 360 ao final de todas as fotos passadas sem blending 
 
+	////////////// Parametros de simulação ////////////////////////////////
  // Inicialização das varivaeis para otimzação
 	int searchAgentsCount_m = 35;// numero de agentes
 	int dimension_m = imagens_src.size() * 6; //  dimensão 
-	int iterations = 1; // número de iterações
+	int iterations = 1000; // número de iterações
 	int simulations = 1;//quantidade de simulações
 	double **positions_inicial = Utils::Create2DRandomArray(searchAgentsCount_m, dimension_m, lb, up);// posição inicial dos agentes 
 
 
 	//**************************** GWO ****************************
 
-	/*for (int a = 0; a < simulations; a++)
+	for (int a = 0; a < simulations; a++)
 	{
 		atexit(freeMemory);
 		argument = new Argument(searchAgentsCount_m, iterations, lb, up);
@@ -111,7 +115,7 @@ int main() {
 			<< gwo << std::endl;
 		cout << "";
 	}
-	freeMemory();*/
+	freeMemory();
 
 
 	//**************************** BAT ****************************
@@ -141,9 +145,32 @@ int main() {
 	freeMemory();
 
 
+	//**************************** AOA ****************************
+
+	std::vector<double> media_inter(iterations, 0.0); // Vetor média por interações;
+	std::vector<double> melhor_inter(iterations, 0.0); // Vetor melhor solução por interação;
+	std::vector<double> MOA(iterations, 0.0); //Math Optimizer Accelerated;
+	double max_MOA = 2,  min_MOA = 0.1; // Valor máximo e minimo da função MOA;
+	std::vector<double> MOP(iterations, 0.0); // Math Optimizer Probability;
+	double alpha_MOP = 5; //Parâmetro sensível e define a precisão da exploração nas iterações; (Valor - Artigo original);
+	double u = 0.49999; // Parâmetro de controle para ajustar o processo de busca; (Valor 0.5 - Artigo original)
+
+	for (int a = 0; a < simulations; a++)
+	{
+		atexit(freeMemory);
+		argument = new Argument(searchAgentsCount_m, iterations, lb, up);
+		argument->Parse();
+		aoa = new AOA(argument->GetBenchmark(), searchAgentsCount_m, iterations, ind_val, media_inter, melhor_inter, MOA, max_MOA, min_MOA, MOP, alpha_MOP, u, positions_inicial);
+		(void)aoa->Evaluate(true, bestKey, imagens_src, im360, indices_vizinhos);
+		std::cout << "Result AOA:" << std::endl
+			<< aoa << std::endl;
+		cout << "";
+		
+	}
+	freeMemory();
 
 
 
 
-	return 0;
+	return 0; 
 }
