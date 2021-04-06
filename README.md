@@ -5,5 +5,6 @@ Os algoritmos implementados no momento são:
 * Grey Wolf Optimizer (GWO)
 * Bat Algorithm (BA)
 * Arithmetic Optimization Algorithm (AOA)
+* Salp Swarm Algorithm (SSA)
 
 
