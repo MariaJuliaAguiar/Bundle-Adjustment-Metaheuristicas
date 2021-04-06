@@ -3,6 +3,6 @@ Montagem de Panorâmicas 360 com ajuste ótimo via Metaheurísticas. As metaheur
 
 Os algoritmos implementados no momento são:
 * Grey Wolf Optimizer (GWO)
-* 
+* Bat Algorithm (BA)
 
 
