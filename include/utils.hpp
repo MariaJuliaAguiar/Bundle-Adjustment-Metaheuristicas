@@ -22,6 +22,7 @@ public:
 	static double** inicialization(unsigned int rowCount, unsigned int columnCount, double **inicial);
 	static void Clip1DArray(double array[], unsigned int columnCount, Boundaries boundaries[]);
 	static void sortArr(double array[], int n, std::vector<int> &Ind_Salp_Ordenado);
+	static void clearResultstxt(std::string pasta);
 };
 
 #endif

@@ -579,14 +579,14 @@ double** Utils::inicialization(unsigned int rowCount, unsigned int columnCount, 
 	for (int y = 0; y < rowCount; y++)
 	{
 		array[y] = new double[columnCount];
-		
-			for (int x = 0; x < columnCount; x++) {
 
-				array[y][x] = inicial[y][x];
-				
+		for (int x = 0; x < columnCount; x++) {
 
-			}
-		
+			array[y][x] = inicial[y][x];
+
+
+		}
+
 	}
 
 
@@ -604,7 +604,7 @@ double* Utils::Create1DArray(unsigned int columnCount) {
 	std::fill_n(array, columnCount, std::numeric_limits<double>::infinity());
 	return array;
 }
-double** Utils::Create2DZeroArray(int search_agents,int dimension) {
+double** Utils::Create2DZeroArray(int search_agents, int dimension) {
 	double **zeros_vector = new double *[search_agents];
 #pragma omp parallel for
 	for (int y = 0; y < search_agents; y++)
@@ -643,7 +643,7 @@ void Utils::sortArr(double array[], int n, std::vector<int> &Ind_Salp_Ordenado)
 	std::vector<std::pair<double, int> > vp;
 	// Inserting element in pair vector
 	// to keep track of previous indexes
-	for (int i = 0; i < n; ++i) 
+	for (int i = 0; i < n; ++i)
 	{
 		vp.push_back(std::make_pair(array[i], i));
 	}
@@ -654,11 +654,53 @@ void Utils::sortArr(double array[], int n, std::vector<int> &Ind_Salp_Ordenado)
 	// Displaying sorted element
 	// with previous indexes
 	// corresponding to each element
-	
+
 	for (int i = 0; i < vp.size(); i++)
 	{
 
 		array[i] = vp[i].first;
 		Ind_Salp_Ordenado[i] = vp[i].second;
 	}
+}
+
+void Utils::clearResultstxt(std::string pasta)
+{
+	std::ofstream ofs;
+	ofs.open(pasta + "convergencia_GWO.txt", std::ofstream::out | std::ofstream::trunc);
+	ofs.close();
+	std::ofstream ofs1;
+	ofs1.open(pasta + "convergencia_BAT.txt", std::ofstream::out | std::ofstream::trunc);
+	ofs1.close();
+	std::ofstream ofs2;
+	ofs2.open(pasta + "convergencia_AOA.txt", std::ofstream::out | std::ofstream::trunc);
+	ofs2.close();
+	std::ofstream ofs3;
+	ofs3.open(pasta + "convergencia_SSA.txt", std::ofstream::out | std::ofstream::trunc);
+	ofs3.close();
+
+	std::ofstream ofs4;
+	ofs4.open(pasta + "best_fit_GWO.txt", std::ofstream::out | std::ofstream::trunc);
+	ofs4.close();
+	std::ofstream ofs5;
+	ofs5.open(pasta + "best_fit_BAT.txt", std::ofstream::out | std::ofstream::trunc);
+	ofs5.close();
+	std::ofstream ofs6;
+	ofs6.open(pasta + "best_fit_AOA.txtt", std::ofstream::out | std::ofstream::trunc);
+	ofs6.close();
+	std::ofstream ofs7;
+	ofs7.open(pasta + "best_fit_SSA.txt", std::ofstream::out | std::ofstream::trunc);
+	ofs7.close();
+
+	std::ofstream ofs8;
+	ofs8.open(pasta + "bests_sol_GWO.txt", std::ofstream::out | std::ofstream::trunc);
+	ofs8.close();
+	std::ofstream ofs9;
+	ofs9.open(pasta + "bests_sol_BAT.txt", std::ofstream::out | std::ofstream::trunc);
+	ofs9.close();
+	std::ofstream ofs10;
+	ofs10.open(pasta + "bests_sol_AOA.txtt", std::ofstream::out | std::ofstream::trunc);
+	ofs10.close();
+	std::ofstream ofs11;
+	ofs11.open(pasta + "bests_sol_SSA.txt", std::ofstream::out | std::ofstream::trunc);
+	ofs11.close();
 }

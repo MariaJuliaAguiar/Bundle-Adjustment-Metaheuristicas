@@ -247,7 +247,7 @@ std::ostream& operator << (std::ostream& os, const GWO *gwo) {
 		<< "Time = " << gwo->executionTime_m << " seconds";
 
 	//melhores fitness em cada simulação
-	std::fstream bests_fit;//(pasta + "convergencia.txt");
+	std::fstream bests_fit;
 	bests_fit.open(path + "best_fit_GWO.txt", std::fstream::app);
 
 	bests_fit << gwo->alphaScore_m << " ";

@@ -59,7 +59,7 @@ void freeMemory() {
 	}*/
 }
 int main() {
-	
+
 	//Localização do arquivo NVM/SFM com posição das imagens de acordo com o PEPO
 	std::string pasta = "C:/Users/julia/Pictures/geradorartesspace/scan3/";
 
@@ -113,8 +113,8 @@ int main() {
 	int simulations = 1;//quantidade de simulações
 	double **positions_inicial = Utils::Create2DRandomArray(searchAgentsCount_m, dimension_m, lb, up);// posição inicial dos agentes 
 
+	Utils::clearResultstxt(pasta);//limpar arquivos de simulações anteriores dessa pasta;
 
-	
 
 	//**************************** GWO ****************************
 
@@ -123,12 +123,12 @@ int main() {
 		atexit(freeMemory);
 		argument = new Argument(searchAgentsCount_m, iterations, lb, up);
 		argument->Parse();
-		gwo = new GWO(argument->GetBenchmark(), searchAgentsCount_m, iterations, ind_val, positions_inicial,pasta);
+		gwo = new GWO(argument->GetBenchmark(), searchAgentsCount_m, iterations, ind_val, positions_inicial, pasta);
 		(void)gwo->Evaluate(true, bestKey, imagens_src, im360, indices_vizinhos);
 		std::cout << " Result GWO:" << std::endl
 			<< gwo << std::endl << std::endl;
 		cout << "";
-		
+
 	}
 	freeMemory();
 
@@ -152,7 +152,7 @@ int main() {
 		atexit(freeMemory);
 		argument = new Argument(searchAgentsCount_m, iterations, lb, up);
 		argument->Parse();
-		bat = new BAT(argument->GetBenchmark(), searchAgentsCount_m, iterations, ind_val, amp_sonora, taxa, lambda, alpha, gama, fmax, fmin, A0, rf, positions_inicial,pasta);
+		bat = new BAT(argument->GetBenchmark(), searchAgentsCount_m, iterations, ind_val, amp_sonora, taxa, lambda, alpha, gama, fmax, fmin, A0, rf, positions_inicial, pasta);
 		(void)bat->Evaluate(true, bestKey, imagens_src, im360, indices_vizinhos);
 		std::cout << "Result BAT:" << std::endl
 			<< bat << std::endl << std::endl;
@@ -166,7 +166,7 @@ int main() {
 	std::vector<double> media_inter(iterations, 0.0); // Vetor média por interações;
 	std::vector<double> melhor_inter(iterations, 0.0); // Vetor melhor solução por interação;
 	std::vector<double> MOA(iterations, 0.0); //Math Optimizer Accelerated;
-	double max_MOA = 2,  min_MOA = 0.1; // Valor máximo e minimo da função MOA;
+	double max_MOA = 2, min_MOA = 0.1; // Valor máximo e minimo da função MOA;
 	std::vector<double> MOP(iterations, 0.0); // Math Optimizer Probability;
 	double alpha_MOP = 5; //Parâmetro sensível e define a precisão da exploração nas iterações; (Valor - Artigo original);
 	double u = 0.49999; // Parâmetro de controle para ajustar o processo de busca; (Valor 0.5 - Artigo original)
@@ -176,12 +176,12 @@ int main() {
 		atexit(freeMemory);
 		argument = new Argument(searchAgentsCount_m, iterations, lb, up);
 		argument->Parse();
-		aoa = new AOA(argument->GetBenchmark(), searchAgentsCount_m, iterations, ind_val, media_inter, melhor_inter, MOA, max_MOA, min_MOA, MOP, alpha_MOP, u, positions_inicial,pasta);
+		aoa = new AOA(argument->GetBenchmark(), searchAgentsCount_m, iterations, ind_val, media_inter, melhor_inter, MOA, max_MOA, min_MOA, MOP, alpha_MOP, u, positions_inicial, pasta);
 		(void)aoa->Evaluate(true, bestKey, imagens_src, im360, indices_vizinhos);
 		std::cout << "Result AOA:" << std::endl
 			<< aoa << std::endl << std::endl;
 		cout << "";
-		
+
 	}
 	freeMemory();
 
@@ -191,7 +191,7 @@ int main() {
 		atexit(freeMemory);
 		argument = new Argument(searchAgentsCount_m, iterations, lb, up);
 		argument->Parse();
-		ssa = new SSA(argument->GetBenchmark(), searchAgentsCount_m, iterations, ind_val, positions_inicial,pasta);
+		ssa = new SSA(argument->GetBenchmark(), searchAgentsCount_m, iterations, ind_val, positions_inicial, pasta);
 		(void)ssa->Evaluate(true, bestKey, imagens_src, im360, indices_vizinhos);
 		std::cout << "Result SSA:" << std::endl
 			<< ssa << std::endl << std::endl;
@@ -202,5 +202,5 @@ int main() {
 
 	//**************************** Plotar Imagens ****************************
 
-	return 0; 
+	return 0;
 }
