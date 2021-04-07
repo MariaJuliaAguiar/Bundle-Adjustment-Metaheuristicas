@@ -35,6 +35,7 @@ private:
 	unsigned int dimension_m;
 	std::vector<int>ind_vazios_m;
 	std::vector<int>ind_val_m;
+	std::string pasta_m;
 	//initialize alpha, beta, and delta_pos
 	double *alphaPosition_m;
 	double alphaScore_m;
@@ -51,7 +52,7 @@ private:
 	void updateWolves(double a);
 
 public:
-	GWO(Benchmark *benchmark, unsigned int searchAgentsCount,unsigned int maximumIterations, std::vector<int>ind_val_m, double **positions_inicial);
+	GWO(Benchmark *benchmark, unsigned int searchAgentsCount,unsigned int maximumIterations, std::vector<int>ind_val_m, double **positions_inicial,std::string pasta);
 	~GWO();
 	double *Evaluate(bool debug, std::vector<std::vector<std::vector<cv::KeyPoint>>> bestKey, std::vector<std::string> imagens_src, cv::Mat im360, std::vector<std::vector<int>> indices);
 	double *GetAlphaPosition();

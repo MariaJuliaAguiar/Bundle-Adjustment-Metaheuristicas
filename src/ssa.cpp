@@ -1,14 +1,14 @@
 //includes
 #include "ssa.hpp"
 #include <math.h>
-SSA::SSA(Benchmark *benchmark, unsigned int searchAgentsCount, unsigned int maximumIterations, std::vector<int>ind_val,  double **positions_inicial)
+SSA::SSA(Benchmark *benchmark, unsigned int searchAgentsCount, unsigned int maximumIterations, std::vector<int>ind_val,  double **positions_inicial,std::string pasta)
 {
 	benchmark_m = benchmark;
 	searchAgentsCount_m = searchAgentsCount;
 	maximumIterations_m = maximumIterations;
 
 	ind_val_m = ind_val;
-
+	pasta_m = pasta;
 	boundaries_m = benchmark_m->getBoundaries();
 	dimension_m = benchmark_m->GetDimension();
 	convergenceCurve_m = Utils::Create1DZeroArray(maximumIterations_m);
@@ -16,7 +16,7 @@ SSA::SSA(Benchmark *benchmark, unsigned int searchAgentsCount, unsigned int maxi
 
 
 	//Initialize the positions of search agents
-	positions_m = positions_inicial;
+	positions_m = Utils::inicialization(searchAgentsCount_m, dimension_m, positions_inicial);
 
 	x_score = Utils::Create1DArray(searchAgentsCount);
 	
@@ -148,10 +148,7 @@ double* SSA::Evaluate(bool debug, std::vector<std::vector<std::vector<cv::KeyPoi
 	cv::Mat image1 = cv::imread(imagens_src[0]);
 	// A avalia a população inicial
 	fitness_inicial(bestKey, imagens_src, im360, image1.rows, image1.cols, indices);
-	for (register int agentIndex = 0; agentIndex < searchAgentsCount_m; agentIndex++)
-	{
-		std::cout << x_score[agentIndex] << std::endl;
-	}
+	
 	
 	double *best_pos;
 	double *x_score_ordenado;
@@ -197,20 +194,43 @@ double* SSA::Evaluate(bool debug, std::vector<std::vector<std::vector<cv::KeyPoi
 	return convergenceCurve_m;
 }
 std::ostream& operator << (std::ostream& os, const SSA *ssa) {
-	os << std::scientific
-		<< std::setprecision(9)
-		<< "Benchmark: " << ssa->benchmark_m->GetName() << std::endl
-		<< "SSA position = ";
+
+	//Salvar resultados em arquivos de textos
+	std::string path = ssa->pasta_m;
+
+	//Melhores soluções de cada simulação
+	std::fstream bests_sol;
+	bests_sol.open(path + "bests_sol_SSA.txt", std::fstream::app);
+
+	os << std::scientific << std::setprecision(9)<< "SSA position = ";
 
 	for (register unsigned int variable = 0; variable < ssa->dimension_m; variable++) {
 		os << ssa->best_positions_m[variable] << " ";
+		bests_sol << ssa->best_positions_m[variable] << " ";
 	}
+	bests_sol << "\n";
+	bests_sol.close();
 
 	os << std::endl
-		<< "Alpha score (Fitness) = " << ssa->best_score << std::endl
+		<< " (Fitness SSA) = " << ssa->best_score << std::endl
 		<< "Time = " << ssa->executionTime_m << " seconds";
 
+	//melhores fitness em cada simulação
+	std::fstream bests_fit;//(pasta + "convergencia.txt");
+	bests_fit.open(path + "best_fit_SSA.txt", std::fstream::app);
+	bests_fit << ssa->best_score << " ";
+	bests_fit << "\n";
+	bests_fit.close();
 
 
+	//Salvar valores de convergencia 
+	std::fstream conv;
+	conv.open(path + "convergencia_SSA.txt", std::fstream::app);
+	for (int j = 0; j < ssa->maximumIterations_m; j++) {
+		conv << ssa->convergenceCurve_m[j] << " ";
+
+	}
+	conv << "\n";
+	conv.close();
 	return os;
 }

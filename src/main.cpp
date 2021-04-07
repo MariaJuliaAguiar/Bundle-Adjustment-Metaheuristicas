@@ -45,7 +45,7 @@ void freeMemory() {
 		delete gwo;
 		gwo = nullptr;
 	}
-	if (bat) {
+	/*	if (bat) {
 		delete bat;
 		bat = nullptr;
 	}
@@ -56,7 +56,7 @@ void freeMemory() {
 	if (ssa) {
 		delete ssa;
 		ssa = nullptr;
-	}
+	}*/
 }
 int main() {
 	
@@ -96,6 +96,7 @@ int main() {
 	for (int i = 0; i < matriz_matches.size(); i++)
 		matriz_matches.at(i).resize(indices_vizinhos[i].size());
 
+
 	std::vector<std::vector<std::vector<cv::KeyPoint>>> bestKey = Utils::sift_matches_matrix_encontrar_melhor(matriz_matches, descp_src, kpts_src, imagens_src, indices_vizinhos);
 
 	float step_deg = 0.1; // [DEGREES]
@@ -113,20 +114,23 @@ int main() {
 	double **positions_inicial = Utils::Create2DRandomArray(searchAgentsCount_m, dimension_m, lb, up);// posição inicial dos agentes 
 
 
+	
+
 	//**************************** GWO ****************************
 
-	/*for (int a = 0; a < simulations; a++)
+	for (int a = 0; a < simulations; a++)
 	{
 		atexit(freeMemory);
 		argument = new Argument(searchAgentsCount_m, iterations, lb, up);
 		argument->Parse();
-		gwo = new GWO(argument->GetBenchmark(), searchAgentsCount_m, iterations, ind_val, positions_inicial);
+		gwo = new GWO(argument->GetBenchmark(), searchAgentsCount_m, iterations, ind_val, positions_inicial,pasta);
 		(void)gwo->Evaluate(true, bestKey, imagens_src, im360, indices_vizinhos);
-		std::cout << "Result GWO:" << std::endl
-			<< gwo << std::endl;
+		std::cout << " Result GWO:" << std::endl
+			<< gwo << std::endl << std::endl;
 		cout << "";
+		
 	}
-	freeMemory();*/
+	freeMemory();
 
 
 	//**************************** BAT ****************************
@@ -142,18 +146,19 @@ int main() {
 	double A0 = 1;//amplitude sonora inicial
 	double rf = 1;//taxa de emissao 
 
-	/*for (int a = 0; a < simulations; a++)
+
+	for (int a = 0; a < simulations; a++)
 	{
 		atexit(freeMemory);
 		argument = new Argument(searchAgentsCount_m, iterations, lb, up);
 		argument->Parse();
-		bat = new BAT(argument->GetBenchmark(), searchAgentsCount_m, iterations, ind_val, amp_sonora, taxa, lambda, alpha, gama, fmax, fmin, A0, rf, positions_inicial);
+		bat = new BAT(argument->GetBenchmark(), searchAgentsCount_m, iterations, ind_val, amp_sonora, taxa, lambda, alpha, gama, fmax, fmin, A0, rf, positions_inicial,pasta);
 		(void)bat->Evaluate(true, bestKey, imagens_src, im360, indices_vizinhos);
 		std::cout << "Result BAT:" << std::endl
-			<< bat << std::endl;
+			<< bat << std::endl << std::endl;
 		cout << "";
 	}
-	freeMemory();*/
+	freeMemory();
 
 
 	//**************************** AOA ****************************
@@ -166,18 +171,18 @@ int main() {
 	double alpha_MOP = 5; //Parâmetro sensível e define a precisão da exploração nas iterações; (Valor - Artigo original);
 	double u = 0.49999; // Parâmetro de controle para ajustar o processo de busca; (Valor 0.5 - Artigo original)
 
-	/*for (int a = 0; a < simulations; a++)
+	for (int a = 0; a < simulations; a++)
 	{
 		atexit(freeMemory);
 		argument = new Argument(searchAgentsCount_m, iterations, lb, up);
 		argument->Parse();
-		aoa = new AOA(argument->GetBenchmark(), searchAgentsCount_m, iterations, ind_val, media_inter, melhor_inter, MOA, max_MOA, min_MOA, MOP, alpha_MOP, u, positions_inicial);
+		aoa = new AOA(argument->GetBenchmark(), searchAgentsCount_m, iterations, ind_val, media_inter, melhor_inter, MOA, max_MOA, min_MOA, MOP, alpha_MOP, u, positions_inicial,pasta);
 		(void)aoa->Evaluate(true, bestKey, imagens_src, im360, indices_vizinhos);
 		std::cout << "Result AOA:" << std::endl
-			<< aoa << std::endl;
+			<< aoa << std::endl << std::endl;
 		cout << "";
 		
-	}*/
+	}
 	freeMemory();
 
 	//**************************** SSA ****************************
@@ -186,14 +191,16 @@ int main() {
 		atexit(freeMemory);
 		argument = new Argument(searchAgentsCount_m, iterations, lb, up);
 		argument->Parse();
-		ssa = new SSA(argument->GetBenchmark(), searchAgentsCount_m, iterations, ind_val, positions_inicial);
+		ssa = new SSA(argument->GetBenchmark(), searchAgentsCount_m, iterations, ind_val, positions_inicial,pasta);
 		(void)ssa->Evaluate(true, bestKey, imagens_src, im360, indices_vizinhos);
 		std::cout << "Result SSA:" << std::endl
-			<< ssa << std::endl;
+			<< ssa << std::endl << std::endl;
 		cout << "";
 
 	}
 	freeMemory();
+
+	//**************************** Plotar Imagens ****************************
 
 	return 0; 
 }

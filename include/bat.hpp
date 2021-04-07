@@ -17,6 +17,7 @@ private:
 
 	std::vector<int>ind_vazios_m;
 	std::vector<int>ind_val_m;
+	std::string pasta_m;
 	//Inicialização da ampplitude e taxa de emissao
 	std::vector<double> A_m;
 	std::vector<double> r_m;
@@ -44,7 +45,7 @@ private:
 	/*void updateWolves(double a);*/
 
 public:
-	BAT::BAT(Benchmark *benchmark, unsigned int searchAgentsCount, unsigned int maximumIterations, std::vector<int>ind_val_m, std::vector<double> amp_sonora, std::vector<double> taxa, double lambda, double alpha, double gama, double fmax, double fmin, double A0, double rf, double **positions_inicial);
+	BAT::BAT(Benchmark *benchmark, unsigned int searchAgentsCount, unsigned int maximumIterations, std::vector<int>ind_val_m, std::vector<double> amp_sonora, std::vector<double> taxa, double lambda, double alpha, double gama, double fmax, double fmin, double A0, double rf, double **positions_inicial, std::string pasta);
 	~BAT();
 	double *Evaluate(bool debug, std::vector<std::vector<std::vector<cv::KeyPoint>>> bestKey, std::vector<std::string> imagens_src, cv::Mat im360, std::vector<std::vector<int>> indices);
 	/*double *GetAlphaPosition();

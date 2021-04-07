@@ -1,14 +1,14 @@
 //includes
 #include "AOA.hpp"
 #include <math.h>
-AOA::AOA(Benchmark *benchmark, unsigned int searchAgentsCount, unsigned int maximumIterations, std::vector<int>ind_val, std::vector<double> media_inter, std::vector<double> melhor_inter, std::vector<double> MOA, double max_MOA, double min_MOA, std::vector<double> MOP, double alpha_MOP, double u, double **positions_inicial)
+AOA::AOA(Benchmark *benchmark, unsigned int searchAgentsCount, unsigned int maximumIterations, std::vector<int>ind_val, std::vector<double> media_inter, std::vector<double> melhor_inter, std::vector<double> MOA, double max_MOA, double min_MOA, std::vector<double> MOP, double alpha_MOP, double u, double **positions_inicial, std::string pasta)
 {
 	benchmark_m = benchmark;
 	searchAgentsCount_m = searchAgentsCount;
 	maximumIterations_m = maximumIterations;
 
 	ind_val_m = ind_val;
-
+	pasta_m = pasta;
 	boundaries_m = benchmark_m->getBoundaries();
 	dimension_m = benchmark_m->GetDimension();
 	convergenceCurve_m = Utils::Create1DZeroArray(maximumIterations_m);
@@ -23,7 +23,7 @@ AOA::AOA(Benchmark *benchmark, unsigned int searchAgentsCount, unsigned int maxi
 	u_m = u;
 
 	//Initialize the positions of search agents
-	positions_m = positions_inicial;
+	positions_m = Utils::inicialization(searchAgentsCount_m, dimension_m, positions_inicial);
 
 	x_score = Utils::Create1DArray(searchAgentsCount);
 	best_score = std::numeric_limits<double >::infinity();
@@ -183,21 +183,47 @@ double* AOA::Evaluate(bool debug, std::vector<std::vector<std::vector<cv::KeyPoi
 
 	return convergenceCurve_m;
 }
+
 std::ostream& operator << (std::ostream& os, const AOA *aoa) {
-	os << std::scientific
-		<< std::setprecision(9)
-		<< "Benchmark: " << aoa->benchmark_m->GetName() << std::endl
-		<< "AOA position = ";
+
+	//Salvar resultados em arquivos de textos
+	std::string path = aoa->pasta_m;
+	
+	//Melhores soluções de cada simulação
+	std::fstream bests_sol;
+	bests_sol.open(path + "bests_sol_AOA.txt", std::fstream::app);
+
+	os << std::scientific << std::setprecision(9) <<"AOA position = ";
 
 	for (register unsigned int variable = 0; variable < aoa->dimension_m; variable++) {
 		os << aoa->best_positions_m[variable] << " ";
+		bests_sol << aoa->best_positions_m[variable] << " ";
 	}
+	bests_sol << "\n";
+	bests_sol.close();
 
+	//melhores fitness em cada simulação
+	std::fstream bests_fit;
+	bests_fit.open(path + "best_fit_AOA.txt", std::fstream::app);
+
+	bests_fit << aoa->best_score << " ";
+	bests_fit << "\n";
+	bests_fit.close();
+
+	
 	os << std::endl
 		<< "Alpha score (Fitness) = " << aoa->best_score << std::endl
 		<< "Time = " << aoa->executionTime_m << " seconds";
 
+	// Salvar valores de convergencia
+	std::fstream conv;
+	conv.open(path + "convergencia_AOA.txt", std::fstream::app);
+	for (int j = 0; j < aoa->maximumIterations_m; j++) {
+		conv << aoa->convergenceCurve_m[j] << " ";
 
+	}
+	conv << "\n";
+	conv.close();
 
 	return os;
 }

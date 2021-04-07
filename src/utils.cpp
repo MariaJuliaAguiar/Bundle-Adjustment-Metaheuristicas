@@ -569,6 +569,30 @@ double** Utils::Create2DRandomArray(unsigned int rowCount, unsigned int columnCo
 	return array;
 
 }
+
+double** Utils::inicialization(unsigned int rowCount, unsigned int columnCount, double **inicial)
+{
+
+	double **array = new double *[rowCount];
+
+#pragma omp parallel for
+	for (int y = 0; y < rowCount; y++)
+	{
+		array[y] = new double[columnCount];
+		
+			for (int x = 0; x < columnCount; x++) {
+
+				array[y][x] = inicial[y][x];
+				
+
+			}
+		
+	}
+
+
+	return array;
+
+}
 // create 1D long double array with value zero
 double* Utils::Create1DZeroArray(unsigned int columnCount) {
 	double *array = new double[columnCount];

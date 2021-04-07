@@ -55,14 +55,14 @@
 #include <Eigen/Dense>
 #include <Eigen/Core>
 GWO::GWO(Benchmark *benchmark, unsigned int searchAgentsCount,
-	unsigned int maximumIterations,  std::vector<int>ind_val, double **positions_inicial)
+	unsigned int maximumIterations,  std::vector<int>ind_val, double **positions_inicial, std::string pasta)
 {
 	benchmark_m = benchmark;
 	searchAgentsCount_m = searchAgentsCount;
 	maximumIterations_m = maximumIterations;
 	
 	ind_val_m = ind_val;
-
+	pasta_m = pasta;
 	boundaries_m = benchmark_m->getBoundaries();
 	dimension_m = benchmark_m->GetDimension();
 	convergenceCurve_m = Utils::Create1DZeroArray(maximumIterations_m);
@@ -74,9 +74,9 @@ GWO::GWO(Benchmark *benchmark, unsigned int searchAgentsCount,
 	betaScore_m = std::numeric_limits<double>::infinity();
 	deltaPosition_m = Utils::Create1DZeroArray(dimension_m);
 	deltaScore_m = std::numeric_limits<double>::infinity();
-
+	
 	//Initialize the positions of search agents
-	positions_m = positions_inicial; //Utils::Create2DRandomArray(searchAgentsCount_m, dimension_m, boundaries_m);
+	positions_m = Utils::inicialization(searchAgentsCount_m, dimension_m, positions_inicial);
 	
 }
 
@@ -225,45 +225,76 @@ double GWO::GetExecutionTime() {
 }
 
 std::ostream& operator << (std::ostream& os, const GWO *gwo) {
-	os << std::scientific
-		<< std::setprecision(9)
-		<< "Benchmark: " << gwo->benchmark_m->GetName() << std::endl
-		<< "Alpha position = ";
+
+//Salvar resultados em arquivos de textos
+	std::string path = gwo->pasta_m;
+
+	//Melhores soluções de cada simulação
+	std::fstream bests_sol;
+	bests_sol.open(path + "bests_sol_GWO.txt", std::fstream::app);
+
+
+	os << std::scientific << std::setprecision(9)<< "Alpha position = ";
 	
 	for (register unsigned int variable = 0; variable < gwo->dimension_m; variable++) {
 		os << gwo->alphaPosition_m[variable] << " ";
+		bests_sol << gwo->alphaPosition_m[variable] << " ";
 	}
-
+	bests_sol << "\n";
+	bests_sol.close();
 	os << std::endl
 		<< "Alpha score (Fitness) = " << gwo->alphaScore_m << std::endl
 		<< "Time = " << gwo->executionTime_m << " seconds";
 
+	//melhores fitness em cada simulação
+	std::fstream bests_fit;//(pasta + "convergencia.txt");
+	bests_fit.open(path + "best_fit_GWO.txt", std::fstream::app);
+
+	bests_fit << gwo->alphaScore_m << " ";
+	bests_fit << "\n";
+	bests_fit.close();
+
+	//Salvar valores de convergencia 
+	std::fstream conv;
+	conv.open(path + "convergencia_GWO.txt", std::fstream::app);
+	for (int j = 0; j < gwo->maximumIterations_m; j++) {
+		conv << gwo->convergenceCurve_m[j] << " ";
+
+	}
+	conv << "\n";
+	conv.close();
+	
+
+	
+	
+
+
 
 	//Writing in sfm file;
 	
-	std::ofstream cam{ "C:/dataset3/dados/cameras_otimizado.sfm" };
-	int teste = 0;
-	int variable = 0;
-	std::vector<int> vazios = gwo->ind_vazios_m;
-	std::vector<int> validos = gwo->ind_val_m;
-	for (int indice_posicao = 0; indice_posicao < gwo->dimension_m / 6; indice_posicao++)
-	{
-		std::string nome_imagem_atual;
-		if (validos[indice_posicao] + 1 < 10)
-			nome_imagem_atual = "imagem_00" + std::to_string(validos[indice_posicao] + 1);
-		else if (validos[indice_posicao] + 1 < 100)
-			nome_imagem_atual = "imagem_0" + std::to_string(validos[indice_posicao] + 1);
-		else
-			nome_imagem_atual = "imagem_" + std::to_string(validos[indice_posicao] + 1);
-		teste = variable + 6;
-		cam << "C:/dataset3/dados/" + nome_imagem_atual + ".png" << " " << "0" << " ";
-		for (variable; variable < teste; variable++)
-		{
-			cam << gwo->alphaPosition_m[variable] << " ";
-			//cam << Utils::denormalize(gwo->alphaPosition_m[variable], gwo->boundaries_m[variable].lowerBound, gwo->boundaries_m[variable].upperBound) << " ";
-		}
-		cam << "\n";
-	}
+	//std::ofstream cam{ "C:/dataset3/dados/cameras_otimizado.sfm" };
+	//int teste = 0;
+	//int variable = 0;
+	//std::vector<int> vazios = gwo->ind_vazios_m;
+	//std::vector<int> validos = gwo->ind_val_m;
+	//for (int indice_posicao = 0; indice_posicao < gwo->dimension_m / 6; indice_posicao++)
+	//{
+	//	std::string nome_imagem_atual;
+	//	if (validos[indice_posicao] + 1 < 10)
+	//		nome_imagem_atual = "imagem_00" + std::to_string(validos[indice_posicao] + 1);
+	//	else if (validos[indice_posicao] + 1 < 100)
+	//		nome_imagem_atual = "imagem_0" + std::to_string(validos[indice_posicao] + 1);
+	//	else
+	//		nome_imagem_atual = "imagem_" + std::to_string(validos[indice_posicao] + 1);
+	//	teste = variable + 6;
+	//	cam << "C:/dataset3/dados/" + nome_imagem_atual + ".png" << " " << "0" << " ";
+	//	for (variable; variable < teste; variable++)
+	//	{
+	//		cam << gwo->alphaPosition_m[variable] << " ";
+	//		//cam << Utils::denormalize(gwo->alphaPosition_m[variable], gwo->boundaries_m[variable].lowerBound, gwo->boundaries_m[variable].upperBound) << " ";
+	//	}
+	//	cam << "\n";
+	//}
 	/*std::vector<std::vector<float> > pose = Utils::FindPoseRaw();
 	double cx, cy, fx, fy;
 	fx = 951.4; fy = 966.2; cx = 658.6; cy = 386.6;
@@ -278,6 +309,6 @@ std::ostream& operator << (std::ostream& os, const GWO *gwo) {
 		cam << "C:/dataset3/dados/" + nome_imagem_atual + ".png" << " " << "0" << " "<<pose[vazios[ind]][2]<< " " <<pose[vazios[ind]][1] << " " <<fx << " " <<fy << " " <<cx << " " <<cy << "\n";
 	}
 */
-	cam.close();
+	/*cam.close();*/
 	return os;
 }

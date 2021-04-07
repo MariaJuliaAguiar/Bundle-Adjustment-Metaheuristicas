@@ -3,7 +3,7 @@
 
 
 BAT::BAT(Benchmark *benchmark, unsigned int searchAgentsCount, unsigned int maximumIterations, std::vector<int>ind_val, std::vector<double> amp_sonora, std::vector<double> taxa, double lambda,
-	double alpha, double gama, double fmax, double fmin, double A0, double rf, double **positions_inicial)
+	double alpha, double gama, double fmax, double fmin, double A0, double rf, double **positions_inicial, std::string pasta)
 {
 	benchmark_m = benchmark;
 	searchAgentsCount_m = searchAgentsCount;
@@ -14,21 +14,21 @@ BAT::BAT(Benchmark *benchmark, unsigned int searchAgentsCount, unsigned int maxi
 	boundaries_m = benchmark_m->getBoundaries();
 	dimension_m = benchmark_m->GetDimension();
 	convergenceCurve_m = Utils::Create1DZeroArray(maximumIterations_m);
-
+	pasta_m = pasta;
 	//Inicialização da ampplitude e taxa de emissao
-	 A_m = amp_sonora;
-	 r_m = taxa;
+	A_m = amp_sonora;
+	r_m = taxa;
 
-	 lambda_m = lambda;
-	 alpha_m = alpha;
-	 gama_m = gama;
-	 fmax_m = fmax;// frequencia maxima
-	 fmin_m = fmin; //frequencia minima
-	 A0_m = A0; //amplitude sonora inicial
-	 rf_m = rf; //taxa de emissa
+	lambda_m = lambda;
+	alpha_m = alpha;
+	gama_m = gama;
+	fmax_m = fmax;// frequencia maxima
+	fmin_m = fmin; //frequencia minima
+	A0_m = A0; //amplitude sonora inicial
+	rf_m = rf; //taxa de emissa
 
-	//Initialize the positions of search agents
-	positions_m = positions_inicial;
+   //Initialize the positions of search agents
+	positions_m = Utils::inicialization(searchAgentsCount_m, dimension_m, positions_inicial);
 	vel_m = Utils::Create2DZeroArray(searchAgentsCount, benchmark_m->GetDimension());
 	x_score = Utils::Create1DArray(searchAgentsCount);
 	best_score = std::numeric_limits<double >::infinity();
@@ -50,7 +50,7 @@ void BAT::calculateFitness(std::vector<std::vector<std::vector<cv::KeyPoint>>> b
 	double fitness;
 
 #pragma omp parallel for //morceguinhos
-	for (register int agentIndex = 0; agentIndex < searchAgentsCount_m; agentIndex++) 
+	for (register int agentIndex = 0; agentIndex < searchAgentsCount_m; agentIndex++)
 	{
 		double *positions_new = new double[dimension_m];
 		double f = fmin_m + (fmax_m - fmin_m)*Utils::GenerateRandomNumber();//frequencia 
@@ -135,11 +135,11 @@ double* BAT::Evaluate(bool debug, std::vector<std::vector<std::vector<cv::KeyPoi
 	cv::Mat image1 = cv::imread(imagens_src[0]);
 	// A avalia a população inicial
 	fitness_inicial(bestKey, imagens_src, im360, image1.rows, image1.cols, indices);
-	int n = sizeof(x_score) / sizeof(x_score[0]);
+
 
 	double *best_pos;
 	//melhor posição e melhor  fitness
-	for (int a = 0; a < n; a++)
+	for (int a = 0; a < searchAgentsCount_m; a++)
 	{
 		if (x_score[a] < best_score)
 		{
@@ -170,20 +170,41 @@ double* BAT::Evaluate(bool debug, std::vector<std::vector<std::vector<cv::KeyPoi
 }
 
 std::ostream& operator << (std::ostream& os, const BAT *bat) {
-	os << std::scientific
-		<< std::setprecision(9)
-		<< "Benchmark: " << bat->benchmark_m->GetName() << std::endl
-		<< "BAT position = ";
+	//Salvar resultados em arquivos de textos
+	std::string path = bat->pasta_m;
 
+	os << std::scientific << std::setprecision(9) << "BAT position = ";
+
+	//Melhores soluções de cada simulação
+	std::fstream bests_sol;
+	bests_sol.open(path + "bests_sol_BAT.txt", std::fstream::app);
 	for (register unsigned int variable = 0; variable < bat->dimension_m; variable++) {
 		os << bat->best_positions_m[variable] << " ";
+		bests_sol << bat->best_positions_m[variable] << " ";
 	}
-
+	bests_sol << "\n";
+	bests_sol.close();
+	//MELHOR FITNESS
 	os << std::endl
-		<< "Alpha score (Fitness) = " << bat->best_score << std::endl
+		<< "(Fitness BAT) = " << bat->best_score << std::endl
 		<< "Time = " << bat->executionTime_m << " seconds";
 
+	//melhores fitness em cada simulação
+	std::fstream bests_fit;
+	bests_fit.open(path + "best_fit_BAT.txt", std::fstream::app);
 
-	
+	bests_fit << bat->best_score << " ";
+	bests_fit << "\n";
+	bests_fit.close();
+
+	//Salvar valores de convergencia 
+	std::fstream conv;
+	conv.open(path + "convergencia_BAT.txt", std::fstream::app);
+	for (int j = 0; j < bat->maximumIterations_m; j++) {
+		conv << bat->convergenceCurve_m[j] << " ";
+
+	}
+	conv << "\n";
+	conv.close();
 	return os;
 }
