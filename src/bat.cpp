@@ -98,7 +98,7 @@ void BAT::calculateFitness(std::vector<std::vector<std::vector<cv::KeyPoint>>> b
 
 	}
 	//Update Alpha, Beta, and Delta
-	
+
 	double best_score_new = std::numeric_limits<double >::infinity();
 	double *best_pos_new;
 	//melhor posição e melhor  fitness
@@ -141,13 +141,16 @@ double* BAT::Evaluate(bool debug, std::vector<std::vector<std::vector<cv::KeyPoi
 
 
 	double *best_pos;
+	best_pos = new double[dimension_m];
 	//melhor posição e melhor  fitness
 	for (int a = 0; a < searchAgentsCount_m; a++)
 	{
 		if (x_score[a] < best_score)
 		{
 			best_score = x_score[a];
-			best_pos = positions_m[a];
+			//best_pos = positions_m[a];
+			std::copy(&positions_m[a][0], &positions_m[a][dimension_m], &best_pos[0]);
+
 		}
 	}
 

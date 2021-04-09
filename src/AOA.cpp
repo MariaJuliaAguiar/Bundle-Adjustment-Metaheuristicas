@@ -142,7 +142,7 @@ double* AOA::Evaluate(bool debug, std::vector<std::vector<std::vector<cv::KeyPoi
 	
 
 	double *best_pos;
-	best_pos = new double[searchAgentsCount_m];
+	best_pos = new double[dimension_m];
 	double mean_x_score = 0;
 	//melhor posição e melhor  fitness
 	for (int a = 0; a < searchAgentsCount_m; a++)

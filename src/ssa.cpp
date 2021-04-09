@@ -169,7 +169,7 @@ double* SSA::Evaluate(bool debug, std::vector<std::vector<std::vector<cv::KeyPoi
 	}
 	best_score = x_score_ordenado[0];
 	//best_pos = positions_Salp_Ordenado[0];
-	best_pos = new double[searchAgentsCount_m];
+	best_pos = new double[dimension_m];
 	std::copy(&positions_Salp_Ordenado[0][0], &positions_Salp_Ordenado[0][dimension_m], &best_pos[0]);
 
 	auto start_time = std::chrono::high_resolution_clock::now();

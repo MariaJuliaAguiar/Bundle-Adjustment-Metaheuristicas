@@ -20,7 +20,7 @@
 #include "bat.hpp"
 #include "AOA.hpp"
 #include "ssa.hpp"
-#include "imagePlots.cpp"
+
 #include "GWOException.hpp"
 /// Definicoes e namespaces
 
@@ -58,6 +58,25 @@ void freeMemory() {
 		delete ssa;
 		ssa = nullptr;
 	}*/
+}
+void freeMemoryOti() {
+	
+	if (gwo) {
+		delete gwo;
+		gwo = nullptr;
+	}
+	if (bat) {
+		delete bat;
+		bat = nullptr;
+	}
+	if (aoa) {
+		delete aoa;
+		aoa = nullptr;
+	}
+	if (ssa) {
+		delete ssa;
+		ssa = nullptr;
+	}
 }
 int main() {
 
@@ -246,7 +265,7 @@ int main() {
 	int index_SSA = std::distance(Best_sol_SSA, it_SSA);
 	cv::Mat im360_SSA = Utils::panoramicas(dimension_m, pasta, Best_pos_SSA[index_SSA]);
 	imwrite(pasta + "im360_SSA.png", im360_SSA);
-
+	freeMemoryOti();
 	std::cout << " Processo Finalizado";
 	return 0;
 }
