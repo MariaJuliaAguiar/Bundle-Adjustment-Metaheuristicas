@@ -56,7 +56,7 @@ void SSA::fitness_inicial(std::vector<std::vector<std::vector<cv::KeyPoint>>> be
 
 	
 }
-void SSA::calculateFitness(std::vector<std::vector<std::vector<cv::KeyPoint>>> bestKey, std::vector<std::string> imagens_src, cv::Mat im360, int rows, int cols, std::vector<std::vector<int>> indices, double *best_pos, double best_score, int it, double c1)
+void SSA::calculateFitness(std::vector<std::vector<std::vector<cv::KeyPoint>>> bestKey, std::vector<std::string> imagens_src, cv::Mat im360, int rows, int cols, std::vector<std::vector<int>> indices, double *best_pos,  int it, double c1)
 {
 	double fitness;
 	double W = 1;
@@ -173,12 +173,12 @@ double* SSA::Evaluate(bool debug, std::vector<std::vector<std::vector<cv::KeyPoi
 	std::copy(&positions_Salp_Ordenado[0][0], &positions_Salp_Ordenado[0][dimension_m], &best_pos[0]);
 
 	auto start_time = std::chrono::high_resolution_clock::now();
-#pragma omp parallel for
+//#pragma omp parallel for
 	for (register int iteration = 0; iteration < maximumIterations_m; iteration++) {
 
 		double c1 = 2 * exp(-pow(4 * (iteration / maximumIterations_m), 2));
 
-		calculateFitness(bestKey, imagens_src, im360, image1.rows, image1.cols, indices, best_pos, best_score, iteration, c1);
+		calculateFitness(bestKey, imagens_src, im360, image1.rows, image1.cols, indices, best_pos, iteration, c1);
 
 		convergenceCurve_m[iteration] = best_score;
 		best_positions_m = best_pos;

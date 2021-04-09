@@ -1,0 +1,90 @@
+close all; clc; clear
+%% Convergencia
+fob_iteration_GWO = load('C:\Users\julia\Pictures\geradorartesspace\scan3\convergencia_GWO.txt');
+fob_iteration_BAT = load('C:\Users\julia\Pictures\geradorartesspace\scan3\convergencia_BAT.txt');
+fob_iteration_AOA = load('C:\Users\julia\Pictures\geradorartesspace\scan3\convergencia_AOA.txt');
+fob_iteration_SSA = load('C:\Users\julia\Pictures\geradorartesspace\scan3\convergencia_SSA.txt');
+%% Melhores fitness
+bestFit_GWO = load('C:\Users\julia\Pictures\geradorartesspace\scan3\best_fit_GWO.txt');
+bestFit_BAT = load('C:\Users\julia\Pictures\geradorartesspace\scan3\best_fit_BAT.txt');
+bestFit_AOA = load('C:\Users\julia\Pictures\geradorartesspace\scan3\best_fit_AOA.txt');
+bestFit_SSA = load('C:\Users\julia\Pictures\geradorartesspace\scan3\best_fit_SSA.txt');
+[Best_score_GWO,I_GWO] = min(bestFit_GWO);
+[Best_score_BAT,I_BAT] = min(bestFit_BAT);
+[Best_score_AOA,I_AOA] = min(bestFit_AOA);
+[Best_score_SSA,I_SSA] = min(bestFit_SSA);
+
+figure('Position',[500 500 660 290])
+%Draw objective space
+subplot(1,4,2);
+semilogy(fob_iteration_GWO,'Color','r')
+title(['GWO: ', num2str(Best_score_GWO)])
+xlabel('Iteration');
+ylabel('Best score obtained so far');
+%axis ([-20 length(fob_iteration_GWO) min([Best_score_GWO Best_score_BAT Best_score_AOA Best_score_SSA]) Best_score_GWO(1)])
+grid on
+box on
+subplot(1,4,1);
+semilogy(AOA_cg_curve,'Color','r')
+title(['AOA: ', num2str(Best_score2)])
+xlabel('Iteration');
+ylabel('Best score obtained so far');
+axis ([-20 length(AOA_cg_curve) min([Best_score Best_score2 Best_score3 Best_score4]) GWO_cg_curve(1)])
+grid on
+box on
+
+subplot(1,4,3);
+semilogy(BAT_cg_curve,'Color','r')
+title(['BAT: ', num2str(Best_score3)])
+xlabel('Iteration');
+ylabel('Best score obtained so far');
+axis ([-20 length(BAT_cg_curve) min([Best_score Best_score2 Best_score3 Best_score4]) GWO_cg_curve(1)])
+grid on
+box on
+subplot(1,4,4);
+
+semilogy(SSA_cg_curve,'Color','r')
+title(['SSA: ', num2str(Best_score4)])
+xlabel('Iteration');
+ylabel('Best score obtained so far');
+axis ([-20 length(SSA_cg_curve) min([Best_score Best_score2 Best_score3 Best_score4]) GWO_cg_curve(1)])
+grid on
+box on
+
+
+
+
+
+
+
+
+
+%% box plot
+Box_ploy_fit_lob = load('C:\Users\julia\Pictures\geradorartesspace\scan3\melhores_fit_lob.txt');
+Box_ploy_fit_bat = load('C:\Users\julia\Pictures\geradorartesspace\scan3\Melhores_fits.txt');
+[fmin_bat,I_bat] = min(Box_ploy_fit_bat);
+final = [Box_ploy_fit_lob;Box_ploy_fit_bat];
+
+figure,
+
+
+ boxplot([Box_ploy_fit_lob Box_ploy_fit_bat],  'Labels',{'GWO','BAT'})
+[fmin_lobo,I_lobo] = min(Box_ploy_fit_lob);
+
+
+
+% porcentagem de erro
+
+original = fob_iteration_bat(1,1)
+
+porcentagem_bat_aumen = original/fmin_bat;
+porcentagem_lob_aumen = original/fmin_lobo;
+
+porcentagem_bat_diminuiu = fmin_bat/original
+porcentagem_lob_diminuiu = fmin_lobo/original
+c = categorical({'original','BAT','GWO'});
+figure,
+bar(c,[original/original porcentagem_bat_diminuiu porcentagem_lob_diminuiu])
+title('Comparação das melhores soluções em relação ao original')
+
+

@@ -166,7 +166,7 @@ int main() {
 	////**************************** BAT ****************************
 	//parâmetros especificos do Bat
 
-	std::vector<double> taxa(searchAgentsCount_m, 0.0);//taxa de emissão dos pulsos
+	std::vector<double> taxa(searchAgentsCount_m, 0.5);//taxa de emissão dos pulsos
 	std::vector<double> amp_sonora(searchAgentsCount_m, Utils::GenerateRandomNumber()); // amplitude sonora
 	double lambda = 0.01;
 	double alpha = 0.9995;
@@ -199,7 +199,7 @@ int main() {
 	freeMemory();
 
 
-	//**************************** AOA ****************************
+	////**************************** AOA ****************************
 
 	std::vector<double> media_inter(iterations, 0.0); // Vetor média por interações;
 	std::vector<double> melhor_inter(iterations, 0.0); // Vetor melhor solução por interação;
@@ -227,8 +227,8 @@ int main() {
 	}
 	freeMemory();
 
-	//**************************** SSA ****************************
-	std::cout << endl << "SSA" << endl;
+	////**************************** SSA ****************************
+	//std::cout << endl << "SSA" << endl;
 
 	double **Best_pos_SSA = new double *[simulations];
 	double *Best_sol_SSA = new double[simulations];
@@ -252,32 +252,32 @@ int main() {
 
 
 
-	std::cout << "Gerando imagens panoramicas"<<endl;
-	//Encontrar melhor solução de todas as simulações 
-	cout << "GWO - ";
-	auto it_gwo = std::min_element(Best_sol_GWO, Best_sol_GWO + simulations);
-	int index_GWO = std::distance(Best_sol_GWO, it_gwo);
-	cv::Mat im360_GWO = Utils::panoramicas(dimension_m, pasta, Best_pos_GWO[index_GWO]);
-	imwrite(pasta + "im360_GWO.png", im360_GWO);
+	//std::cout << "Gerando imagens panoramicas"<<endl;
+	////Encontrar melhor solução de todas as simulações 
+	//cout << "GWO - ";
+	//auto it_gwo = std::min_element(Best_sol_GWO, Best_sol_GWO + simulations);
+	//int index_GWO = std::distance(Best_sol_GWO, it_gwo);
+	//cv::Mat im360_GWO = Utils::panoramicas(dimension_m, pasta, Best_pos_GWO[index_GWO]);
+	//imwrite(pasta + "im360_GWO.png", im360_GWO);
 
-	cout << "BAT - ";
-	auto it_BAT = std::min_element(Best_sol_BAT, Best_sol_BAT + simulations);
-	int index_BAT = std::distance(Best_sol_BAT, it_BAT);
-	cv::Mat im360_BAT = Utils::panoramicas(dimension_m, pasta, Best_pos_BAT[index_BAT]);
-	imwrite(pasta + "im360_BAT.png", im360_BAT);
+	//cout << "BAT - ";
+	//auto it_BAT = std::min_element(Best_sol_BAT, Best_sol_BAT + simulations);
+	//int index_BAT = std::distance(Best_sol_BAT, it_BAT);
+	//cv::Mat im360_BAT = Utils::panoramicas(dimension_m, pasta, Best_pos_BAT[index_BAT]);
+	//imwrite(pasta + "im360_BAT.png", im360_BAT);
 
-	cout << "AOA - ";
-	auto it_AOA = std::min_element(Best_sol_AOA, Best_sol_AOA + simulations);
-	int index_AOA = std::distance(Best_sol_AOA, it_AOA);
-	cv::Mat im360_AOA = Utils::panoramicas(dimension_m, pasta, Best_pos_AOA[index_AOA]);
-	imwrite(pasta + "im360_AOA.png", im360_AOA);
+	//cout << "AOA - ";
+	//auto it_AOA = std::min_element(Best_sol_AOA, Best_sol_AOA + simulations);
+	//int index_AOA = std::distance(Best_sol_AOA, it_AOA);
+	//cv::Mat im360_AOA = Utils::panoramicas(dimension_m, pasta, Best_pos_AOA[index_AOA]);
+	//imwrite(pasta + "im360_AOA.png", im360_AOA);
 
-	cout << "SSA - ";
-	auto it_SSA = std::min_element(Best_sol_SSA, Best_sol_SSA + simulations);
-	int index_SSA = std::distance(Best_sol_SSA, it_SSA);
-	cv::Mat im360_SSA = Utils::panoramicas(dimension_m, pasta, Best_pos_SSA[index_SSA]);
-	imwrite(pasta + "im360_SSA.png", im360_SSA);
-	freeMemoryOti();
+	//cout << "SSA - ";
+	//auto it_SSA = std::min_element(Best_sol_SSA, Best_sol_SSA + simulations);
+	//int index_SSA = std::distance(Best_sol_SSA, it_SSA);
+	//cv::Mat im360_SSA = Utils::panoramicas(dimension_m, pasta, Best_pos_SSA[index_SSA]);
+	//imwrite(pasta + "im360_SSA.png", im360_SSA);
+	//freeMemoryOti();
 	std::cout << " Processo Finalizado";
 	return 0;
 }

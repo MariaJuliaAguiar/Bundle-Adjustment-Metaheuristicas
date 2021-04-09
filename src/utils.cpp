@@ -355,6 +355,7 @@ std::vector<std::vector<std::vector<cv::KeyPoint>>> Utils::sift_matches_matrix_e
 			}
 		}
 	}
+
 	bool debug = false;
 	std::vector<std::vector<std::vector<cv::KeyPoint>>> bestKey;
 	std::vector<cv::DMatch> best_matches;

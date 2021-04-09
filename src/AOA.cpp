@@ -60,12 +60,12 @@ void AOA::fitness_inicial(std::vector<std::vector<std::vector<cv::KeyPoint>>> be
 	}
 
 }
-void AOA::calculateFitness(std::vector<std::vector<std::vector<cv::KeyPoint>>> bestKey, std::vector<std::string> imagens_src, cv::Mat im360, int rows, int cols, std::vector<std::vector<int>> indices, double *best_pos, double best_score, int it, double MOA, double MOP)
+void AOA::calculateFitness(std::vector<std::vector<std::vector<cv::KeyPoint>>> bestKey, std::vector<std::string> imagens_src, cv::Mat im360, int rows, int cols, std::vector<std::vector<int>> indices, double *best_pos, int it, double MOA, double MOP)
 {
 
 	double fitness;
 
-#pragma omp parallel for //morceguinhos
+//#pragma omp parallel for 
 	for (register int agentIndex = 0; agentIndex < searchAgentsCount_m; agentIndex++)
 	{
 		std::vector<double> r1(dimension_m, 0), r2(dimension_m, 0), r3(dimension_m, 0);
@@ -120,7 +120,8 @@ void AOA::calculateFitness(std::vector<std::vector<std::vector<cv::KeyPoint>>> b
 		if (abs(fitness) < abs(best_solind[agentIndex]))
 		{
 			best_solind[agentIndex] = fitness;
-			best_posind[agentIndex] = positions_m[agentIndex];
+			//best_posind[agentIndex] = positions_m[agentIndex];
+			std::copy(&positions_m[agentIndex][0], &positions_m[agentIndex][dimension_m], &best_posind[agentIndex][0]);
 			if (abs(best_solind[agentIndex]) < abs(best_score))
 			{
 				best_score = best_solind[agentIndex];
@@ -139,7 +140,7 @@ double* AOA::Evaluate(bool debug, std::vector<std::vector<std::vector<cv::KeyPoi
 	cv::Mat image1 = cv::imread(imagens_src[0]);
 	// A avalia a população inicial
 	fitness_inicial(bestKey, imagens_src, im360, image1.rows, image1.cols, indices);
-
+	std::cout << "fit original " << x_score[0] << std::endl;
 
 	double *best_pos;
 	best_pos = new double[dimension_m];
@@ -162,7 +163,7 @@ double* AOA::Evaluate(bool debug, std::vector<std::vector<std::vector<cv::KeyPoi
 	mean_x_score = mean_x_score / searchAgentsCount_m;
 
 	auto start_time = std::chrono::high_resolution_clock::now();
-#pragma omp parallel for
+//#pragma omp parallel for
 	for (register int iteration = 0; iteration < maximumIterations_m; iteration++) {
 
 
@@ -170,8 +171,8 @@ double* AOA::Evaluate(bool debug, std::vector<std::vector<std::vector<cv::KeyPoi
 		melhor_inter_m[iteration] = best_score;
 		MOA_m[iteration] = min_MOA_m + iteration * ((max_MOA_m - min_MOA_m) / maximumIterations_m);
 		MOP_m[iteration] = 1 - (pow(iteration, (1 / alpha_MOP_m)) / pow(maximumIterations_m, (1 / alpha_MOP_m)));
-
-		calculateFitness(bestKey, imagens_src, im360, image1.rows, image1.cols, indices, best_pos, best_score, iteration, MOA_m[iteration], MOP_m[iteration]);
+		
+		calculateFitness(bestKey, imagens_src, im360, image1.rows, image1.cols, indices, best_pos, iteration, MOA_m[iteration], MOP_m[iteration]);
 
 		convergenceCurve_m[iteration] = best_score;
 		best_positions_m = best_pos;

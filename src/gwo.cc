@@ -123,7 +123,7 @@ void GWO::calculateFitness(std::vector<std::vector<std::vector<cv::KeyPoint>>> b
 
 void GWO::updateWolves(double a) {
 	
-#pragma omp parallel for
+//#pragma omp parallel for
 	for (register int agentIndex = 0; agentIndex < searchAgentsCount_m; agentIndex++)
 	{
 		for (register unsigned int variable = 0; variable < dimension_m; variable++) {
@@ -167,7 +167,7 @@ double* GWO::Evaluate(bool debug, std::vector<std::vector<std::vector<cv::KeyPoi
 	cv::Mat image1 = cv::imread(imagens_src[0]);
 
 	auto start_time = std::chrono::high_resolution_clock::now();
-#pragma omp parallel for
+//#pragma omp parallel for
 	for (register int iteration = 0; iteration < maximumIterations_m; iteration++) {
 
 		calculateFitness(bestKey, imagens_src, im360, image1.rows, image1.cols, indices);

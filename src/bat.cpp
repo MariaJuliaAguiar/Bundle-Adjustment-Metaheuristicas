@@ -48,11 +48,11 @@ BAT::~BAT() {
 	delete convergenceCurve_m;
 
 }
-void BAT::calculateFitness(std::vector<std::vector<std::vector<cv::KeyPoint>>> bestKey, std::vector<std::string> imagens_src, cv::Mat im360, int rows, int cols, std::vector<std::vector<int>> indices, double *best_pos, double best_score, int it)
+void BAT::calculateFitness(std::vector<std::vector<std::vector<cv::KeyPoint>>> bestKey, std::vector<std::string> imagens_src, cv::Mat im360, int rows, int cols, std::vector<std::vector<int>> indices, double *best_pos,  int it)
 {
 	double fitness;
 
-#pragma omp parallel for //morceguinhos
+//#pragma omp parallel for //morceguinhos
 	for (register int agentIndex = 0; agentIndex < searchAgentsCount_m; agentIndex++)
 	{
 		double *positions_new = new double[dimension_m];
@@ -67,7 +67,7 @@ void BAT::calculateFitness(std::vector<std::vector<std::vector<cv::KeyPoint>>> b
 		}
 
 		//etapa de busca local
-		if (Utils::GenerateRandomNumber() < r_m[agentIndex])
+		if (Utils::GenerateRandomNumber() <r_m[agentIndex])
 		{
 			for (register unsigned int variable = 0; variable < dimension_m; variable++) {
 				double mean_amp = std::accumulate(A_m.begin(), A_m.end(), 0.0) / A_m.size();
@@ -91,7 +91,7 @@ void BAT::calculateFitness(std::vector<std::vector<std::vector<cv::KeyPoint>>> b
 		if (fitness <= x_score[agentIndex] && Utils::GenerateRandomNumber() < A_m[agentIndex]) {
 			positions_m[agentIndex] = positions_new;
 			x_score[agentIndex] = fitness;
-			r_m[agentIndex] = rf_m * (1 - exp(-gama_m * it));//atualiza a taxa de emissao de pulsos
+			r_m[agentIndex] = rf_m * (1 - exp(-gama_m * (it)));//atualiza a taxa de emissao de pulsos
 		}
 
 		A_m[agentIndex] = alpha_m * A_m[agentIndex];//atualiza a amplitude sonora
@@ -115,7 +115,7 @@ void BAT::calculateFitness(std::vector<std::vector<std::vector<cv::KeyPoint>>> b
 void BAT::fitness_inicial(std::vector<std::vector<std::vector<cv::KeyPoint>>> bestKey, std::vector<std::string> imagens_src, cv::Mat im360, int rows, int cols, std::vector<std::vector<int>> indices) {
 	double fitness;
 
-#pragma omp parallel for
+//#pragma omp parallel for
 	for (register int agentIndex = 0; agentIndex < searchAgentsCount_m; agentIndex++) {
 		Utils::Clip1DArray(positions_m[agentIndex], dimension_m, boundaries_m);
 
@@ -138,8 +138,8 @@ double* BAT::Evaluate(bool debug, std::vector<std::vector<std::vector<cv::KeyPoi
 	cv::Mat image1 = cv::imread(imagens_src[0]);
 	// A avalia a população inicial
 	fitness_inicial(bestKey, imagens_src, im360, image1.rows, image1.cols, indices);
-
-
+	A_m[0] = A0_m;
+	std::cout << "fit original" << x_score[0] << std::endl;
 	double *best_pos;
 	best_pos = new double[dimension_m];
 	//melhor posição e melhor  fitness
@@ -155,10 +155,10 @@ double* BAT::Evaluate(bool debug, std::vector<std::vector<std::vector<cv::KeyPoi
 	}
 
 	auto start_time = std::chrono::high_resolution_clock::now();
-#pragma omp parallel for
+//#pragma omp parallel for
 	for (register int iteration = 0; iteration < maximumIterations_m; iteration++) {
 
-		calculateFitness(bestKey, imagens_src, im360, image1.rows, image1.cols, indices, best_pos, best_score, iteration);
+		calculateFitness(bestKey, imagens_src, im360, image1.rows, image1.cols, indices, best_pos, iteration);
 		convergenceCurve_m[iteration] = best_score;
 		best_positions_m = best_pos;
 		/*if (debug && (iteration % 1 == 0)) {
