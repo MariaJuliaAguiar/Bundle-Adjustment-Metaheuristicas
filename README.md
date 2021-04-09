@@ -8,5 +8,5 @@ Os algoritmos implementados no momento são:
 * Salp Swarm Algorithm (SSA)
 
 
-## Examples ([All original data available for __download__](https://github.com/mariajuliagrin/Bundle-Adjustment-Metaheuristicas/releases/tag/0.1)):
+## Examples ([Imagens disponíveis para dowload](https://github.com/mariajuliagrin/Bundle-Adjustment-Metaheuristicas/releases/tag/0.1)):
 
