@@ -28,7 +28,9 @@ SSA::~SSA() {
 	for (register unsigned int agentId = 0; agentId < searchAgentsCount_m; agentId++) {
 		delete positions_m[agentId];
 	}
-
+	delete positions_m;
+	delete best_positions_m;
+	delete x_score;
 	delete convergenceCurve_m;
 }
 void SSA::fitness_inicial(std::vector<std::vector<std::vector<cv::KeyPoint>>> bestKey, std::vector<std::string> imagens_src, cv::Mat im360, int rows, int cols, std::vector<std::vector<int>> indices) {
@@ -166,8 +168,9 @@ double* SSA::Evaluate(bool debug, std::vector<std::vector<std::vector<cv::KeyPoi
 
 	}
 	best_score = x_score_ordenado[0];
-	best_pos = positions_Salp_Ordenado[0];
-
+	//best_pos = positions_Salp_Ordenado[0];
+	best_pos = new double[searchAgentsCount_m];
+	std::copy(&positions_Salp_Ordenado[0][0], &positions_Salp_Ordenado[0][dimension_m], &best_pos[0]);
 
 	auto start_time = std::chrono::high_resolution_clock::now();
 #pragma omp parallel for
@@ -193,6 +196,15 @@ double* SSA::Evaluate(bool debug, std::vector<std::vector<std::vector<cv::KeyPoi
 
 	return convergenceCurve_m;
 }
+
+double* SSA::GetBestPositionSSA() {
+	return best_positions_m;
+}
+
+double SSA::GetBestScore() {
+	return best_score;
+}
+
 std::ostream& operator << (std::ostream& os, const SSA *ssa) {
 
 	//Salvar resultados em arquivos de textos

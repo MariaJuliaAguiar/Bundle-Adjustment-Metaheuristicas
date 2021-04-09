@@ -182,11 +182,11 @@ double* GWO::Evaluate(bool debug, std::vector<std::vector<std::vector<cv::KeyPoi
 		updateWolves(a);
 		convergenceCurve_m[iteration] = alphaScore_m;
 
-		if (debug && (iteration % 1 == 0)) {
+	/*	if (debug && (iteration % 1 == 0)) {
 			std::cout << "At iteration " << iteration << " the best fitness is "
 				<< std::setprecision(3)
 				<< alphaScore_m << std::endl;
-		}
+		}*/
 
 	}
 
@@ -237,7 +237,7 @@ std::ostream& operator << (std::ostream& os, const GWO *gwo) {
 	os << std::scientific << std::setprecision(9)<< "Alpha position = ";
 	
 	for (register unsigned int variable = 0; variable < gwo->dimension_m; variable++) {
-		os << gwo->alphaPosition_m[variable] << " ";
+		/*os << gwo->alphaPosition_m[variable] << " ";*/
 		bests_sol << gwo->alphaPosition_m[variable] << " ";
 	}
 	bests_sol << "\n";

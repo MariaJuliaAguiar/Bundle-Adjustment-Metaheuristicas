@@ -44,9 +44,9 @@ public:
 	AOA::AOA(Benchmark *benchmark, unsigned int searchAgentsCount, unsigned int maximumIterations, std::vector<int>ind_val, std::vector<double> media_inter, std::vector<double> melhor_inter, std::vector<double> MOA, double max_MOA, double min_MOA, std::vector<double> MOP, double alpha_MOP, double u, double **positions_inicial, std::string pasta);
 	~AOA();
 	double *Evaluate(bool debug, std::vector<std::vector<std::vector<cv::KeyPoint>>> bestKey, std::vector<std::string> imagens_src, cv::Mat im360, std::vector<std::vector<int>> indices);
-	/*double *GetAlphaPosition();
-	double GetAlphaScore();
-	double *GetBetaPosition();
+	double *GetBestPositionAOA();
+	double AOA::GetBestScore();
+	/*double *GetBetaPosition();
 	double GetBetaScore();
 	double *GetDeltaPosition();
 	double GetDeltaScore();

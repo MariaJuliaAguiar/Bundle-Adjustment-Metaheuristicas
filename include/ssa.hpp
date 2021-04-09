@@ -35,9 +35,9 @@ public:
 	SSA::SSA(Benchmark *benchmark, unsigned int searchAgentsCount, unsigned int maximumIterations, std::vector<int>ind_val,   double **positions_inicial, std::string pasta);
 	~SSA();
 	double *Evaluate(bool debug, std::vector<std::vector<std::vector<cv::KeyPoint>>> bestKey, std::vector<std::string> imagens_src, cv::Mat im360, std::vector<std::vector<int>> indices);
-	/*double *GetAlphaPosition();
-	double GetAlphaScore();
-	double *GetBetaPosition();
+	double *GetBestPositionSSA();
+	double GetBestScore();
+	/*double *GetBetaPosition();
 	double GetBetaScore();
 	double *GetDeltaPosition();
 	double GetDeltaScore();

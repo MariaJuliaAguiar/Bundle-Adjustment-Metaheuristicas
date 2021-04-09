@@ -21,7 +21,7 @@ private:
 	//Inicialização da ampplitude e taxa de emissao
 	std::vector<double> A_m;
 	std::vector<double> r_m;
-	double ** vel_m;
+	double **vel_m;
 
 	double lambda_m;
 	double alpha_m;
@@ -48,9 +48,9 @@ public:
 	BAT::BAT(Benchmark *benchmark, unsigned int searchAgentsCount, unsigned int maximumIterations, std::vector<int>ind_val_m, std::vector<double> amp_sonora, std::vector<double> taxa, double lambda, double alpha, double gama, double fmax, double fmin, double A0, double rf, double **positions_inicial, std::string pasta);
 	~BAT();
 	double *Evaluate(bool debug, std::vector<std::vector<std::vector<cv::KeyPoint>>> bestKey, std::vector<std::string> imagens_src, cv::Mat im360, std::vector<std::vector<int>> indices);
-	/*double *GetAlphaPosition();
-	double GetAlphaScore();
-	double *GetBetaPosition();
+	double *GetBestPositionBAT();
+	double GetBestScore();
+	/*double *GetBetaPosition();
 	double GetBetaScore();
 	double *GetDeltaPosition();
 	double GetDeltaScore();

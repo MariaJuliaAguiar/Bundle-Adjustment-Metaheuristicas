@@ -41,7 +41,10 @@ BAT::~BAT() {
 		delete positions_m[agentId];
 		delete vel_m[agentId];
 	}
-
+	delete positions_m;
+	delete vel_m;
+	delete best_positions_m;
+	delete x_score;
 	delete convergenceCurve_m;
 
 }
@@ -95,11 +98,11 @@ void BAT::calculateFitness(std::vector<std::vector<std::vector<cv::KeyPoint>>> b
 
 	}
 	//Update Alpha, Beta, and Delta
-	int n = sizeof(x_score) / sizeof(x_score[0]);
+	
 	double best_score_new = std::numeric_limits<double >::infinity();
 	double *best_pos_new;
 	//melhor posição e melhor  fitness
-	for (int a = 0; a < n; a++) {
+	for (int a = 0; a < searchAgentsCount_m; a++) {
 		if (x_score[a] < best_score_new) {
 			best_score_new = x_score[a];
 			best_pos_new = positions_m[a];
@@ -167,6 +170,12 @@ double* BAT::Evaluate(bool debug, std::vector<std::vector<std::vector<cv::KeyPoi
 	executionTime_m = std::chrono::duration_cast<std::chrono::nanoseconds>(finish_time - start_time).count() * 1e-9;
 
 	return convergenceCurve_m;
+}
+double* BAT::GetBestPositionBAT() {
+	return best_positions_m;
+}
+double BAT::GetBestScore() {
+	return best_score;
 }
 
 std::ostream& operator << (std::ostream& os, const BAT *bat) {

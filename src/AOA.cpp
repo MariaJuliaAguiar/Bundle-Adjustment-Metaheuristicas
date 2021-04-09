@@ -34,7 +34,9 @@ AOA::~AOA() {
 	for (register unsigned int agentId = 0; agentId < searchAgentsCount_m; agentId++) {
 		delete positions_m[agentId];
 	}
-
+	delete positions_m;
+	delete best_positions_m;
+	delete x_score;
 	delete convergenceCurve_m;
 }
 void AOA::fitness_inicial(std::vector<std::vector<std::vector<cv::KeyPoint>>> bestKey, std::vector<std::string> imagens_src, cv::Mat im360, int rows, int cols, std::vector<std::vector<int>> indices) {
@@ -60,7 +62,7 @@ void AOA::fitness_inicial(std::vector<std::vector<std::vector<cv::KeyPoint>>> be
 }
 void AOA::calculateFitness(std::vector<std::vector<std::vector<cv::KeyPoint>>> bestKey, std::vector<std::string> imagens_src, cv::Mat im360, int rows, int cols, std::vector<std::vector<int>> indices, double *best_pos, double best_score, int it, double MOA, double MOP)
 {
-	srand(time(NULL));
+	
 	double fitness;
 
 #pragma omp parallel for //morceguinhos
@@ -123,6 +125,8 @@ void AOA::calculateFitness(std::vector<std::vector<std::vector<cv::KeyPoint>>> b
 			{
 				best_score = best_solind[agentIndex];
 				best_pos = best_posind[agentIndex];
+
+
 			}
 
 		}
@@ -135,25 +139,27 @@ double* AOA::Evaluate(bool debug, std::vector<std::vector<std::vector<cv::KeyPoi
 	cv::Mat image1 = cv::imread(imagens_src[0]);
 	// A avalia a população inicial
 	fitness_inicial(bestKey, imagens_src, im360, image1.rows, image1.cols, indices);
-	int n = sizeof(x_score) / sizeof(x_score[0]);
+	
 
 	double *best_pos;
-
+	best_pos = new double[searchAgentsCount_m];
 	double mean_x_score = 0;
 	//melhor posição e melhor  fitness
-	for (int a = 0; a < n; a++)
+	for (int a = 0; a < searchAgentsCount_m; a++)
 	{
 		if (x_score[a] < best_score)
 		{
 			best_score = x_score[a];
-			best_pos = positions_m[a];
+			//best_pos = positions_m[a];
+			std::copy(&positions_m[a][0], &positions_m[a][dimension_m], &best_pos[0]);
+
 		}
 		mean_x_score += x_score[a];
 	}
-	best_posind = positions_m;
+	best_posind = Utils::inicialization(searchAgentsCount_m, dimension_m, positions_m); 
 	best_solind = x_score;
 
-	mean_x_score = mean_x_score / n;
+	mean_x_score = mean_x_score / searchAgentsCount_m;
 
 	auto start_time = std::chrono::high_resolution_clock::now();
 #pragma omp parallel for
@@ -182,6 +188,12 @@ double* AOA::Evaluate(bool debug, std::vector<std::vector<std::vector<cv::KeyPoi
 	executionTime_m = std::chrono::duration_cast<std::chrono::nanoseconds>(finish_time - start_time).count() * 1e-9;
 
 	return convergenceCurve_m;
+}
+double* AOA::GetBestPositionAOA() {
+	return best_positions_m;
+}
+double AOA::GetBestScore() {
+	return best_score;
 }
 
 std::ostream& operator << (std::ostream& os, const AOA *aoa) {
