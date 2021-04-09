@@ -7,6 +7,6 @@ Os algoritmos implementados no momento são:
 * Arithmetic Optimization Algorithm (AOA)
 * Salp Swarm Algorithm (SSA)
 
-As imagens para serem usadas como exemplos estão disponíveis [aqui](https://github.com/mariajuliagrin/Bundle-Adjustment-Metaheuristicas/releases/tag/0.1))
+As imagens para serem usadas como exemplos estão disponíveis [aqui](https://github.com/mariajuliagrin/Bundle-Adjustment-Metaheuristicas/releases/tag/0.1).
 
 
