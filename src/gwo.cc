@@ -93,7 +93,7 @@ GWO::~GWO() {
 
 void GWO::calculateFitness(std::vector<std::vector<std::vector<cv::KeyPoint>>> bestKey, std::vector<std::string> imagens_src, cv::Mat im360, int rows, int cols, std::vector<std::vector<int>> indices) {
 	double fitness;
-	//auto start_time = std::chrono::high_resolution_clock::now();
+	
 #pragma omp parallel for
 	for (register int agentIndex = 0; agentIndex < searchAgentsCount_m; agentIndex++) {
 		Utils::Clip1DArray(positions_m[agentIndex], dimension_m, boundaries_m);
@@ -118,13 +118,11 @@ void GWO::calculateFitness(std::vector<std::vector<std::vector<cv::KeyPoint>>> b
 			std::copy(&positions_m[agentIndex][0], &positions_m[agentIndex][dimension_m], &deltaPosition_m[0]);
 		}
 	}
-	/*auto finish_time = std::chrono::high_resolution_clock::now();
-	auto time = std::chrono::duration_cast<std::chrono::nanoseconds>(finish_time - start_time).count() * 1e-9;
-	std::cout <<"calculateFitness: " <<time << "\n";*/
+	
 }
 
 void GWO::updateWolves(double a) {
-	//auto start_time = std::chrono::high_resolution_clock::now();
+	
 #pragma omp parallel for
 	for (register int agentIndex = 0; agentIndex < searchAgentsCount_m; agentIndex++)
 	{
@@ -161,9 +159,7 @@ void GWO::updateWolves(double a) {
 		}
 		
 	}
-	/*auto finish_time = std::chrono::high_resolution_clock::now();
-	auto time = std::chrono::duration_cast<std::chrono::nanoseconds>(finish_time - start_time).count() * 1e-9;
-	std::cout << "updateWolves: " << time << "\n";*/
+	
 }
 
 double* GWO::Evaluate(bool debug, std::vector<std::vector<std::vector<cv::KeyPoint>>> bestKey, std::vector<std::string> imagens_src, cv::Mat im360, std::vector<std::vector<int>> indices) {
@@ -234,7 +230,7 @@ std::ostream& operator << (std::ostream& os, const GWO *gwo) {
 	bests_sol.open(path + "bests_sol_GWO.txt", std::fstream::app);
 
 
-	os << std::scientific << std::setprecision(9)<< "Alpha position = ";
+	//os << std::scientific << std::setprecision(9)<< "GWO position = ";
 	
 	for (register unsigned int variable = 0; variable < gwo->dimension_m; variable++) {
 		/*os << gwo->alphaPosition_m[variable] << " ";*/
@@ -242,9 +238,8 @@ std::ostream& operator << (std::ostream& os, const GWO *gwo) {
 	}
 	bests_sol << "\n";
 	bests_sol.close();
-	os << std::endl
-		<< "Alpha score (Fitness) = " << gwo->alphaScore_m << std::endl
-		<< "Time = " << gwo->executionTime_m << " seconds";
+	os << "  GWO score (Fitness) = " << gwo->alphaScore_m << std::endl
+		<< "  Time = " << gwo->executionTime_m << " seconds";
 
 	//melhores fitness em cada simulação
 	std::fstream bests_fit;

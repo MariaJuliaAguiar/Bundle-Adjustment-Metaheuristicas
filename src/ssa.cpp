@@ -183,11 +183,11 @@ double* SSA::Evaluate(bool debug, std::vector<std::vector<std::vector<cv::KeyPoi
 		convergenceCurve_m[iteration] = best_score;
 		best_positions_m = best_pos;
 
-		if (debug && (iteration % 1 == 0)) {
+		/*if (debug && (iteration % 1 == 0)) {
 			std::cout << "At iteration " << iteration << " the best fitness is "
 				<< std::setprecision(3)
 				<< best_score << std::endl;
-		}
+		}*/
 
 	}
 
@@ -214,18 +214,17 @@ std::ostream& operator << (std::ostream& os, const SSA *ssa) {
 	std::fstream bests_sol;
 	bests_sol.open(path + "bests_sol_SSA.txt", std::fstream::app);
 
-	os << std::scientific << std::setprecision(9)<< "SSA position = ";
+	//os << std::scientific << std::setprecision(9)<< "SSA position = ";
 
 	for (register unsigned int variable = 0; variable < ssa->dimension_m; variable++) {
-		os << ssa->best_positions_m[variable] << " ";
+	//	os << ssa->best_positions_m[variable] << " ";
 		bests_sol << ssa->best_positions_m[variable] << " ";
 	}
 	bests_sol << "\n";
 	bests_sol.close();
 
-	os << std::endl
-		<< " (Fitness SSA) = " << ssa->best_score << std::endl
-		<< "Time = " << ssa->executionTime_m << " seconds";
+	os << "  SSA score(Fitness) = " << ssa->best_score << std::endl
+		<< "  Time = " << ssa->executionTime_m << " seconds";
 
 	//melhores fitness em cada simulação
 	std::fstream bests_fit;//(pasta + "convergencia.txt");

@@ -489,7 +489,7 @@ std::vector<std::vector<std::vector<cv::KeyPoint>>> Utils::sift_matches_matrix_e
 
 			}
 
-			printf("%d tuples (%d trial, %d actual).\n", cnt, number_of_trial, i);
+			//printf("%d tuples (%d trial, %d actual).\n", cnt, number_of_trial, i);
 			best_kptgt.clear();
 			best_kpsrc.clear();
 

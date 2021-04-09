@@ -62,14 +62,14 @@ void AOA::fitness_inicial(std::vector<std::vector<std::vector<cv::KeyPoint>>> be
 }
 void AOA::calculateFitness(std::vector<std::vector<std::vector<cv::KeyPoint>>> bestKey, std::vector<std::string> imagens_src, cv::Mat im360, int rows, int cols, std::vector<std::vector<int>> indices, double *best_pos, double best_score, int it, double MOA, double MOP)
 {
-	
+
 	double fitness;
 
 #pragma omp parallel for //morceguinhos
 	for (register int agentIndex = 0; agentIndex < searchAgentsCount_m; agentIndex++)
 	{
-		std::vector<double> r1(dimension_m,0), r2(dimension_m, 0), r3(dimension_m, 0);
-	
+		std::vector<double> r1(dimension_m, 0), r2(dimension_m, 0), r3(dimension_m, 0);
+
 		std::generate(r1.begin(), r1.end(), Utils::GenerateRandomNumber);
 		std::generate(r2.begin(), r2.end(), Utils::GenerateRandomNumber);
 		std::generate(r3.begin(), r3.end(), Utils::GenerateRandomNumber);
@@ -139,7 +139,7 @@ double* AOA::Evaluate(bool debug, std::vector<std::vector<std::vector<cv::KeyPoi
 	cv::Mat image1 = cv::imread(imagens_src[0]);
 	// A avalia a população inicial
 	fitness_inicial(bestKey, imagens_src, im360, image1.rows, image1.cols, indices);
-	
+
 
 	double *best_pos;
 	best_pos = new double[dimension_m];
@@ -156,7 +156,7 @@ double* AOA::Evaluate(bool debug, std::vector<std::vector<std::vector<cv::KeyPoi
 		}
 		mean_x_score += x_score[a];
 	}
-	best_posind = Utils::inicialization(searchAgentsCount_m, dimension_m, positions_m); 
+	best_posind = Utils::inicialization(searchAgentsCount_m, dimension_m, positions_m);
 	best_solind = x_score;
 
 	mean_x_score = mean_x_score / searchAgentsCount_m;
@@ -172,15 +172,15 @@ double* AOA::Evaluate(bool debug, std::vector<std::vector<std::vector<cv::KeyPoi
 		MOP_m[iteration] = 1 - (pow(iteration, (1 / alpha_MOP_m)) / pow(maximumIterations_m, (1 / alpha_MOP_m)));
 
 		calculateFitness(bestKey, imagens_src, im360, image1.rows, image1.cols, indices, best_pos, best_score, iteration, MOA_m[iteration], MOP_m[iteration]);
-		
+
 		convergenceCurve_m[iteration] = best_score;
 		best_positions_m = best_pos;
-		
-		if (debug && (iteration % 1 == 0)) {
+
+		/*if (debug && (iteration % 1 == 0)) {
 			std::cout << "At iteration " << iteration << " the best fitness is "
 				<< std::setprecision(3)
 				<< best_score << std::endl;
-		}
+		}*/
 
 	}
 
@@ -200,15 +200,15 @@ std::ostream& operator << (std::ostream& os, const AOA *aoa) {
 
 	//Salvar resultados em arquivos de textos
 	std::string path = aoa->pasta_m;
-	
+
 	//Melhores soluções de cada simulação
 	std::fstream bests_sol;
 	bests_sol.open(path + "bests_sol_AOA.txt", std::fstream::app);
 
-	os << std::scientific << std::setprecision(9) <<"AOA position = ";
+	//os << std::scientific << std::setprecision(9) <<"AOA position = ";
 
 	for (register unsigned int variable = 0; variable < aoa->dimension_m; variable++) {
-		os << aoa->best_positions_m[variable] << " ";
+		//os << aoa->best_positions_m[variable] << " ";
 		bests_sol << aoa->best_positions_m[variable] << " ";
 	}
 	bests_sol << "\n";
@@ -222,10 +222,9 @@ std::ostream& operator << (std::ostream& os, const AOA *aoa) {
 	bests_fit << "\n";
 	bests_fit.close();
 
-	
-	os << std::endl
-		<< "Alpha score (Fitness) = " << aoa->best_score << std::endl
-		<< "Time = " << aoa->executionTime_m << " seconds";
+
+	os 	<< "  AOA score (Fitness) = " << aoa->best_score << std::endl
+		<< "  Time = " << aoa->executionTime_m << " seconds";
 
 	// Salvar valores de convergencia
 	std::fstream conv;

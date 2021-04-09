@@ -161,11 +161,11 @@ double* BAT::Evaluate(bool debug, std::vector<std::vector<std::vector<cv::KeyPoi
 		calculateFitness(bestKey, imagens_src, im360, image1.rows, image1.cols, indices, best_pos, best_score, iteration);
 		convergenceCurve_m[iteration] = best_score;
 		best_positions_m = best_pos;
-		if (debug && (iteration % 1 == 0)) {
+		/*if (debug && (iteration % 1 == 0)) {
 			std::cout << "At iteration " << iteration << " the best fitness is "
 				<< std::setprecision(3)
 				<< best_score << std::endl;
-		}
+		}*/
 
 	}
 
@@ -185,21 +185,20 @@ std::ostream& operator << (std::ostream& os, const BAT *bat) {
 	//Salvar resultados em arquivos de textos
 	std::string path = bat->pasta_m;
 
-	os << std::scientific << std::setprecision(9) << "BAT position = ";
+	//os << std::scientific << std::setprecision(9) << "BAT position = ";
 
 	//Melhores soluções de cada simulação
 	std::fstream bests_sol;
 	bests_sol.open(path + "bests_sol_BAT.txt", std::fstream::app);
 	for (register unsigned int variable = 0; variable < bat->dimension_m; variable++) {
-		os << bat->best_positions_m[variable] << " ";
+		//os << bat->best_positions_m[variable] << " ";
 		bests_sol << bat->best_positions_m[variable] << " ";
 	}
 	bests_sol << "\n";
 	bests_sol.close();
 	//MELHOR FITNESS
-	os << std::endl
-		<< "(Fitness BAT) = " << bat->best_score << std::endl
-		<< "Time = " << bat->executionTime_m << " seconds";
+	os 	<< "  BAT (Fitness) = " << bat->best_score << std::endl
+		<< "  Time = " << bat->executionTime_m << " seconds";
 
 	//melhores fitness em cada simulação
 	std::fstream bests_fit;

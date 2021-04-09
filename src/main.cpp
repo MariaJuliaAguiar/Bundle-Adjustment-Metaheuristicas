@@ -60,7 +60,7 @@ void freeMemory() {
 	}*/
 }
 void freeMemoryOti() {
-	
+
 	if (gwo) {
 		delete gwo;
 		gwo = nullptr;
@@ -105,6 +105,8 @@ int main() {
 	vector<cv::Mat>  descp_src;
 	descp_src.resize(imagens_src.size());
 	kpts_src.resize(imagens_src.size());
+
+	std::cout << "Calculando features e matches" << std::endl;
 	//Encontrando features
 	Utils::calcular_features_sift(descp_src, kpts_src, imagens_src);
 
@@ -129,24 +131,28 @@ int main() {
  // Inicialização das varivaeis para otimzação
 	int searchAgentsCount_m = 35;// numero de agentes
 	int dimension_m = imagens_src.size() * 6; //  dimensão 
-	int iterations = 1; // número de iterações
-	int simulations =1;//quantidade de simulações
+	int iterations = 1000; // número de iterações
+	int simulations = 5;//quantidade de simulações
 	double **positions_inicial = Utils::Create2DRandomArray(searchAgentsCount_m, dimension_m, lb, up);// posição inicial dos agentes 
 
 	Utils::clearResultstxt(pasta);//limpar arquivos de simulações anteriores dessa pasta;
 
+	std::cout << "Iniciando processo de otimizacao ..." << std::endl;
 
+
+	std::cout<<endl << "GWO" << endl;
 	//**************************** GWO ****************************
 	double **Best_pos_GWO = new double *[simulations];
 	double *Best_sol_GWO = new double[simulations];
 	for (int a = 0; a < simulations; a++)
 	{
+		
 		atexit(freeMemory);
 		argument = new Argument(searchAgentsCount_m, iterations, lb, up);
 		argument->Parse();
 		gwo = new GWO(argument->GetBenchmark(), searchAgentsCount_m, iterations, ind_val, positions_inicial, pasta);
 		(void)gwo->Evaluate(true, bestKey, imagens_src, im360, indices_vizinhos);
-		std::cout << " Result GWO:" << std::endl
+		std::cout << " Result "<<a << std::endl
 			<< gwo << std::endl << std::endl;
 		cout << "";
 		Best_pos_GWO[a] = gwo->GetAlphaPosition();
@@ -172,7 +178,7 @@ int main() {
 
 	double **Best_pos_BAT = new double *[simulations];
 	double *Best_sol_BAT = new double[simulations];
-
+	std::cout << endl << "BAT" << endl;
 	for (int a = 0; a < simulations; a++)
 	{
 		atexit(freeMemory);
@@ -180,7 +186,7 @@ int main() {
 		argument->Parse();
 		bat = new BAT(argument->GetBenchmark(), searchAgentsCount_m, iterations, ind_val, amp_sonora, taxa, lambda, alpha, gama, fmax, fmin, A0, rf, positions_inicial, pasta);
 		(void)bat->Evaluate(true, bestKey, imagens_src, im360, indices_vizinhos);
-		std::cout << "Result BAT:" << std::endl
+		std::cout << " Result " << a << std::endl
 			<< bat << std::endl << std::endl;
 		cout << "";
 
@@ -205,6 +211,7 @@ int main() {
 
 	double **Best_pos_AOA = new double *[simulations];
 	double *Best_sol_AOA = new double[simulations];
+	std::cout << endl << "AOA" << endl;
 	for (int a = 0; a < simulations; a++)
 	{
 		atexit(freeMemory);
@@ -212,7 +219,7 @@ int main() {
 		argument->Parse();
 		aoa = new AOA(argument->GetBenchmark(), searchAgentsCount_m, iterations, ind_val, media_inter, melhor_inter, MOA, max_MOA, min_MOA, MOP, alpha_MOP, u, positions_inicial, pasta);
 		(void)aoa->Evaluate(true, bestKey, imagens_src, im360, indices_vizinhos);
-		std::cout << "Result AOA:" << std::endl
+		std::cout << " Result " << a << std::endl
 			<< aoa << std::endl << std::endl;
 		cout << "";
 		Best_pos_AOA[a] = aoa->GetBestPositionAOA();
@@ -221,6 +228,8 @@ int main() {
 	freeMemory();
 
 	//**************************** SSA ****************************
+	std::cout << endl << "SSA" << endl;
+
 	double **Best_pos_SSA = new double *[simulations];
 	double *Best_sol_SSA = new double[simulations];
 	for (int a = 0; a < simulations; a++)
@@ -230,7 +239,7 @@ int main() {
 		argument->Parse();
 		ssa = new SSA(argument->GetBenchmark(), searchAgentsCount_m, iterations, ind_val, positions_inicial, pasta);
 		(void)ssa->Evaluate(true, bestKey, imagens_src, im360, indices_vizinhos);
-		std::cout << "Result SSA:" << std::endl
+		std::cout << " Result " << a << std::endl
 			<< ssa << std::endl << std::endl;
 		cout << "";
 		Best_pos_SSA[a] = ssa->GetBestPositionSSA();
@@ -243,24 +252,27 @@ int main() {
 
 
 
-
+	std::cout << "Gerando imagens panoramicas"<<endl;
 	//Encontrar melhor solução de todas as simulações 
-
+	cout << "GWO - ";
 	auto it_gwo = std::min_element(Best_sol_GWO, Best_sol_GWO + simulations);
 	int index_GWO = std::distance(Best_sol_GWO, it_gwo);
 	cv::Mat im360_GWO = Utils::panoramicas(dimension_m, pasta, Best_pos_GWO[index_GWO]);
 	imwrite(pasta + "im360_GWO.png", im360_GWO);
 
+	cout << "BAT - ";
 	auto it_BAT = std::min_element(Best_sol_BAT, Best_sol_BAT + simulations);
 	int index_BAT = std::distance(Best_sol_BAT, it_BAT);
 	cv::Mat im360_BAT = Utils::panoramicas(dimension_m, pasta, Best_pos_BAT[index_BAT]);
 	imwrite(pasta + "im360_BAT.png", im360_BAT);
 
+	cout << "AOA - ";
 	auto it_AOA = std::min_element(Best_sol_AOA, Best_sol_AOA + simulations);
 	int index_AOA = std::distance(Best_sol_AOA, it_AOA);
 	cv::Mat im360_AOA = Utils::panoramicas(dimension_m, pasta, Best_pos_AOA[index_AOA]);
 	imwrite(pasta + "im360_AOA.png", im360_AOA);
 
+	cout << "SSA - ";
 	auto it_SSA = std::min_element(Best_sol_SSA, Best_sol_SSA + simulations);
 	int index_SSA = std::distance(Best_sol_SSA, it_SSA);
 	cv::Mat im360_SSA = Utils::panoramicas(dimension_m, pasta, Best_pos_SSA[index_SSA]);
