@@ -18,40 +18,7 @@
 //  You should have received a copy of the GNU Lesser General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#include <cmath> //pow
 #include "benchmark/fob.hpp"
-#include "utils.hpp"
-#include <iostream>
-#include <string>
-#include <math.h>
-#include <sys/stat.h>
-#include <ostream>
-#include <chrono>
-#include <pcl/point_cloud.h>
-#include <pcl/point_types.h>
-#include <pcl/io/pcd_io.h>
-#include <pcl/io/ply_io.h>
-#include <pcl/filters/voxel_grid.h>
-#include <pcl/filters/extract_indices.h>
-#include <pcl/filters/conditional_removal.h>
-#include <pcl/filters/statistical_outlier_removal.h>
-
-#include <pcl/kdtree/kdtree_flann.h>
-#include <dirent.h>
-
-#include <opencv2/imgproc/imgproc.hpp>
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/core/mat.hpp>
-#include "opencv2/xfeatures2d.hpp"
-#include "opencv2/core.hpp"
-#include "opencv2/features2d.hpp"
-#include "opencv2/calib3d.hpp"
-#include <opencv2/stitching/detail/blenders.hpp>
-
-#include <Eigen/Geometry>
-#include <Eigen/Dense>
-#include <Eigen/Core>
-
 Benchmark* fob::Create(std::vector<double> lb, std::vector<double> up) {
 
 	return new fob(lb, up);

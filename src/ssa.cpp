@@ -1,6 +1,6 @@
 //includes
 #include "ssa.hpp"
-#include <math.h>
+
 SSA::SSA(Benchmark *benchmark, unsigned int searchAgentsCount, unsigned int maximumIterations, std::vector<int>ind_val,  double **positions_inicial,std::string pasta)
 {
 	benchmark_m = benchmark;

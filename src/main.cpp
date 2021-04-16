@@ -1,17 +1,3 @@
-#include <opencv2/imgproc/imgproc.hpp>
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/core/mat.hpp>
-#include "opencv2/xfeatures2d.hpp"
-#include "opencv2/core.hpp"
-#include "opencv2/features2d.hpp"
-#include "opencv2/calib3d.hpp"
-#include <opencv2/stitching/detail/blenders.hpp>
-#include <cstdlib> //atexit
-#include <iostream> //cerr, cout
-#include <numeric>
-#include <vector>
-#include <pcl/io/pcd_io.h>
-#include <pcl/io/ply_io.h>
 //includes meus 
 
 #include "argument.hpp"
@@ -42,22 +28,7 @@ void freeMemory() {
 		delete argument;
 		argument = nullptr;
 	}
-	/*if (gwo) {
-		delete gwo;
-		gwo = nullptr;
-	}
-	if (bat) {
-		delete bat;
-		bat = nullptr;
-	}
-	if (aoa) {
-		delete aoa;
-		aoa = nullptr;
-	}
-	if (ssa) {
-		delete ssa;
-		ssa = nullptr;
-	}*/
+
 }
 void freeMemoryOti() {
 

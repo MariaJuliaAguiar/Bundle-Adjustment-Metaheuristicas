@@ -2,8 +2,7 @@
 #define __AOA_H
 #include "utils.hpp"
 #include "benchmark.hpp"
-#include <cstdlib> //atexit
-#include <iostream> //cerr, cout
+
 class AOA {
 
 private:

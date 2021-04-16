@@ -1,6 +1,6 @@
 //includes
 #include "AOA.hpp"
-#include <math.h>
+
 AOA::AOA(Benchmark *benchmark, unsigned int searchAgentsCount, unsigned int maximumIterations, std::vector<int>ind_val, std::vector<double> media_inter, std::vector<double> melhor_inter, std::vector<double> MOA, double max_MOA, double min_MOA, std::vector<double> MOP, double alpha_MOP, double u, double **positions_inicial, std::string pasta)
 {
 	benchmark_m = benchmark;

@@ -25,14 +25,14 @@ axis ([-20 length(fob_iteration_GWO)+100 Best_score_GWO-10 fob_iteration_GWO(1)]
 grid on
 box on
 
-% subplot(1,4,1);
-% semilogy(1:t,fob_iteration_BAT)
-% title(['BAT: ', num2str(Best_score_BAT)])
-% xlabel('Iteration');
-% ylabel('Best score obtained so far');
-% axis ([-20 length(fob_iteration_BAT) min([Best_score_GWO Best_score_BAT Best_score_AOA Best_score_SSA]) fob_iteration_BAT(1)+100])
-% grid on
-% box on
+subplot(1,4,1);
+semilogy(1:t,fob_iteration_BAT)
+title(['BAT: ', num2str(Best_score_BAT)])
+xlabel('Iteration');
+ylabel('Best score obtained so far');
+axis ([-20 length(fob_iteration_BAT)  Best_score_BAT-10  fob_iteration_BAT(1)+100])
+grid on
+box on
 
 subplot(1,4,3);
 semilogy(1:t,fob_iteration_AOA)

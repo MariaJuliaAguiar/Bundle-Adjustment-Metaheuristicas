@@ -2,6 +2,9 @@
 #include "bat.hpp"
 
 
+
+
+
 BAT::BAT(Benchmark *benchmark, unsigned int searchAgentsCount, unsigned int maximumIterations, std::vector<int>ind_val, std::vector<double> amp_sonora, std::vector<double> taxa, double lambda,
 	double alpha, double gama, double fmax, double fmin, double A0, double rf, double **positions_inicial, std::string pasta)
 {

@@ -1,10 +1,16 @@
 #ifndef __UTILS_H
 #define __UTILS_H
-#include <opencv2/opencv.hpp>
-#include <Eigen/Geometry>
-#include <Eigen/Dense>
-#include <Eigen/Core>
-#include "benchmark.hpp"
+#include "benchmark/fob.hpp"
+#include <algorithm>
+#include <numeric>
+#include <chrono>
+
+#include <opencv2/highgui/highgui.hpp>
+#include "opencv2/xfeatures2d.hpp"
+#include <opencv2/core/eigen.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+#include "opencv2/calib3d.hpp"
+
 class Utils {
 
 public:

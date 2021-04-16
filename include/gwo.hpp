@@ -22,8 +22,7 @@
 #define __GWO_H
 #include "utils.hpp"
 #include "benchmark.hpp"
-#include <cstdlib> //atexit
-#include <iostream> //cerr, cout
+
 class GWO {
 
 private:
