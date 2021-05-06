@@ -17,8 +17,12 @@ include_directories(${PCL_INCLUDE_DIRS})
 include_directories(${OpenMP_INCLUDE_DIRS})
 include_directories("${CMAKE_SOURCE_DIR}/include/")
 
-SET(HEADERS    include/utils.hpp include/argument.hpp include/benchmark.hpp  include/benchmarkFactory.hpp include/benchmark/fob.hpp include/gwo.hpp include/GWOException.hpp include/bat.hpp include/AOA.hpp include/ssa.hpp )
-add_executable(BAMeta ${HEADERS} src/main.cpp src/utils.cpp src/argument.cc src/benchmark.cc src/benchmarkFactory.cc benchmark/fob.cc src/gwo.cc src/GWOException.cc src/bat.cpp src/AOA.cpp src/ssa.cpp )
+find_package(Ceres REQUIRED)
+include_directories(${CERES_INCLUDE_DIRS})
+LINK_LIBRARIES(${CERES_LIBRARIES})
+
+SET(HEADERS    include/utils.hpp include/argument.hpp include/benchmark.hpp  include/benchmarkFactory.hpp include/benchmark/fob.hpp include/gwo.hpp include/GWOException.hpp include/bat.hpp include/AOA.hpp include/ssa.hpp include/bundle_adjutment.hpp include/PSO.hpp)
+add_executable(BAMeta ${HEADERS} src/main.cpp src/utils.cpp src/argument.cc src/benchmark.cc src/benchmarkFactory.cc benchmark/fob.cc src/gwo.cc src/GWOException.cc src/bat.cpp src/AOA.cpp src/ssa.cpp src/PSO.cpp)
 target_compile_options(BAMeta PRIVATE ${OpenMP_FLAGS})
 target_link_libraries(BAMeta  ${PCL_LIBRARIES} ${OpenCV_LIBS} ${OpenMP_LIBS})
 

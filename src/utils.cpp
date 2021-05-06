@@ -30,7 +30,8 @@ std::vector<std::vector<float>>  Utils::lerSFM(std::string pasta, double &fx, do
 
 	std::vector<std::vector<float>> pose;
 	// Para cada imagem, obter valores
-
+	std::fstream conv;
+	conv.open(pasta+"original.sfm");
 	for (int i = 0; i < linhas.size(); i++) {
 		std::istringstream iss(linhas[i]);
 		std::vector<std::string> splits(std::istream_iterator<std::string>{iss}, std::istream_iterator<std::string>());
@@ -52,9 +53,10 @@ std::vector<std::vector<float>>  Utils::lerSFM(std::string pasta, double &fx, do
 		fy = stod(splits[14]);
 		cx = stod(splits[15]);
 		cy = stod(splits[16]);
-
+		
+		conv << pasta + nome_fim + ".png" << " " << ea[1] << " " << ea[2] << " " << fx << " " << fy << " " << cx << " " << cy << "\n";
 	}
-
+	conv.close();
 	return pose;//roll,tilt,pan
 
 }
@@ -62,6 +64,7 @@ std::vector<std::vector<float>>  Utils::lerSFM(std::string pasta, double &fx, do
 // Função para encontrar os limites maximos e minimos dos parâmetros
 void Utils::uplowerBound(std::vector<std::vector<float> > pose, double fx, double fy, double cx, double cy, std::vector<double> &lb, std::vector<double> &up)
 {
+	
 
 	for (int j = 0; j < pose.size(); j++)
 	{
@@ -88,6 +91,7 @@ std::vector<std::vector<int>> Utils::FindVizinhos(int images_size) {
 	int initial = 0;
 	std::vector<std::vector<int>>indices_vizinhos;
 	indices_vizinhos.resize(images_size);
+
 	for (int a = initial; a < images_size; a++)
 	{
 
@@ -313,6 +317,18 @@ void Utils::filtrar_matches_keypoints_repetidos(std::vector<cv::KeyPoint> &kt, s
 	// Retornando as matches que restaram
 	m = otimas_matches;
 }
+bool findMinMaxcols(cv::Point const& a, cv::Point const& b)
+{
+	return a.x < b.x ;
+}
+bool points_are_equal(const cv::Point2f& p1, const cv::Point2f& p2) {
+	return ((p1.x == p2.x) && (p1.y == p2.y));
+}
+bool lexico_compare(const cv::Point2f& p1, const cv::Point2f& p2) {
+	if (p1.x < p2.x) { return true; }
+	if (p1.x > p2.x) { return false; }
+	return (p1.y < p2.y);
+}
 
 // Encontrar as correspondencias entre as imagens e suas vizinhas 
 std::vector<std::vector<std::vector<cv::KeyPoint>>> Utils::sift_matches_matrix_encontrar_melhor(std::vector<std::vector<  std::vector<cv::DMatch> >> matriz_matches, std::vector<cv::Mat>  descp_src, std::vector< std::vector<cv::KeyPoint> >  kpts_src, std::vector<std::string> imagens_src, std::vector<std::vector<int>> &indices) {
@@ -323,6 +339,9 @@ std::vector<std::vector<std::vector<cv::KeyPoint>>> Utils::sift_matches_matrix_e
 
 	std::vector<std::vector<int>> filter_zero;
 	filter_zero.resize(imagens_src.size());
+	
+
+
 	for (int frame0 = 0; frame0 < imagens_src.size(); frame0++) {
 
 		for (int frame1 = 0; frame1 < indices[frame0].size(); frame1++)
@@ -357,7 +376,9 @@ std::vector<std::vector<std::vector<cv::KeyPoint>>> Utils::sift_matches_matrix_e
 	std::vector<cv::DMatch> best_matches;
 	std::vector<cv::KeyPoint> best_kptgt, best_kpsrc;
 	bestKey.resize(imagens_src.size());
-
+	/*std::fstream outkeypt1; std::fstream  outkeypt2;
+	outkeypt1.open("C:/dataset3/teste/key1.txt");
+	outkeypt2.open("C:/dataset3/teste/key2.txt");*/
 	for (int frame0 = 0; frame0 < imagens_src.size(); frame0++)
 	{
 
@@ -494,19 +515,81 @@ std::vector<std::vector<std::vector<cv::KeyPoint>>> Utils::sift_matches_matrix_e
 			std::iota(std::begin(v), std::end(v), 0); // Fill with 0, 1, ..., 99.
 			//std::random_shuffle(v.begin(), v.end());
 			int t = best_kpsrc_org.size();
+			
+			//std::sort(XY.begin(), XY.end(), lexico_compare);
+			if (frame1 ==0) 
+			{
+				std::sort(std::begin(v), std::end(v),
+					[&](int i1, int i2) {
+					if (best_kpsrc_org[i1].pt.x < best_kpsrc_org[i2].pt.x) { return true; }
+					if (best_kpsrc_org[i1].pt.x > best_kpsrc_org[i2].pt.x) { return false; }
+					return (best_kpsrc_org[i1].pt.y < best_kpsrc_org[i2].pt.y);
+				});
 
-			t = (t < 50) ? t : 50;
+				v.erase(std::unique(std::begin(v), std::end(v),
+					[&](int i1, int i2) {
+					return ((best_kpsrc_org[i1].pt.x == best_kpsrc_org[i2].pt.x) && (best_kpsrc_org[i1].pt.y == best_kpsrc_org[i2].pt.y));
+				}), std::end(v));
+			}
+			else {
+				std::sort(std::begin(v), std::end(v),
+					[&](int i1, int i2) {
+					/*if (best_kpsrc_org[i1].pt.x < best_kpsrc_org[i2].pt.x) { return true; }
+					if (best_kpsrc_org[i1].pt.x > best_kpsrc_org[i2].pt.x) { return false; }*/
+					return (best_kpsrc_org[i1].pt.y < best_kpsrc_org[i2].pt.y);
+				});
 
-			for (int i = 0; i < t; i++) {
+				v.erase(std::unique(std::begin(v), std::end(v),
+					[&](int i1, int i2) {
+					return ((best_kpsrc_org[i1].pt.x == best_kpsrc_org[i2].pt.x) && (best_kpsrc_org[i1].pt.y == best_kpsrc_org[i2].pt.y));
+				}), std::end(v));
+
+
+				
+			}
+			
+			
+			
+			t = (t < 50)?t : 50;
+			
+			
+			for (int i = v.size()-10; i < v.size(); i++) {
 				best_kpsrc.push_back(best_kpsrc_org[v[i]]);
 				best_kptgt.push_back(best_kptgt_org[v[i]]);
+				
 			}
 			if (t > 0) {
 				filter_zero[frame0].push_back(indices[frame0][frame1]);
 				bestKey[frame0].push_back(best_kpsrc);
 				bestKey[frame0].push_back(best_kptgt);
+				
 			}
-
+			if (debug) {
+				cv::Mat im1 = cv::imread(imagens_src[indices[frame0][frame1]], cv::IMREAD_COLOR);
+				cv::Mat im2 = cv::imread(imagens_src[frame0], cv::IMREAD_COLOR);
+				for (int i = 0; i < best_kptgt.size(); i++)
+				{
+					int r = rand() % 255, b = rand() % 255, g = rand() % 255;
+					circle(im1, cv::Point(best_kptgt[i].pt.x, best_kptgt[i].pt.y), 8, cv::Scalar(r, g, b), cv::FILLED, cv::LINE_8);
+					circle(im2, cv::Point(best_kpsrc[i].pt.x, best_kpsrc[i].pt.y), 8, cv::Scalar(r, g, b), cv::FILLED, cv::LINE_8);
+				}
+				imwrite("C:/dataset3/im_tgt3.png", im1);
+				imwrite("C:/dataset3/im_src3.png", im2);
+			
+				}
+			//
+			//for (int i = 0; i < best_kpsrc.size(); i++) 
+			//{
+			//					outkeypt1 << best_kpsrc[i].pt.x << " " << best_kpsrc[i].pt.y << '\n'; // << Chega aqui ele não faz nada
+			//					//cout << "? ";
+			//				}
+			//for (int i = 0; i < best_kptgt.size(); i++)
+			//{
+			//	outkeypt2 << best_kptgt[i].pt.x << " " << best_kptgt[i].pt.y << '\n'; // << Chega aqui ele não faz nada
+			//	//cout << "? ";
+			//}
+			//outkeypt1.close();
+			//outkeypt2.close();
 			best_kptgt.clear();
 			best_kpsrc.clear();
 			best_kpsrc_org.clear();
@@ -674,32 +757,43 @@ void Utils::clearResultstxt(std::string pasta)
 	std::ofstream ofs3;
 	ofs3.open(pasta + "convergencia_SSA.txt", std::ofstream::out | std::ofstream::trunc);
 	ofs3.close();
-
 	std::ofstream ofs4;
-	ofs4.open(pasta + "best_fit_GWO.txt", std::ofstream::out | std::ofstream::trunc);
+	ofs4.open(pasta + "convergencia_PSO.txt", std::ofstream::out | std::ofstream::trunc);
 	ofs4.close();
+
+
+
 	std::ofstream ofs5;
-	ofs5.open(pasta + "best_fit_BAT.txt", std::ofstream::out | std::ofstream::trunc);
+	ofs5.open(pasta + "best_fit_GWO.txt", std::ofstream::out | std::ofstream::trunc);
 	ofs5.close();
 	std::ofstream ofs6;
-	ofs6.open(pasta + "best_fit_AOA.txt", std::ofstream::out | std::ofstream::trunc);
+	ofs6.open(pasta + "best_fit_BAT.txt", std::ofstream::out | std::ofstream::trunc);
 	ofs6.close();
 	std::ofstream ofs7;
-	ofs7.open(pasta + "best_fit_SSA.txt", std::ofstream::out | std::ofstream::trunc);
+	ofs7.open(pasta + "best_fit_AOA.txt", std::ofstream::out | std::ofstream::trunc);
 	ofs7.close();
-
 	std::ofstream ofs8;
-	ofs8.open(pasta + "bests_sol_GWO.txt", std::ofstream::out | std::ofstream::trunc);
+	ofs8.open(pasta + "best_fit_SSA.txt", std::ofstream::out | std::ofstream::trunc);
 	ofs8.close();
 	std::ofstream ofs9;
-	ofs9.open(pasta + "bests_sol_BAT.txt", std::ofstream::out | std::ofstream::trunc);
+	ofs9.open(pasta + "best_fit_PSO.txt", std::ofstream::out | std::ofstream::trunc);
 	ofs9.close();
+
 	std::ofstream ofs10;
-	ofs10.open(pasta + "bests_sol_AOA.txt", std::ofstream::out | std::ofstream::trunc);
+	ofs10.open(pasta + "bests_sol_GWO.txt", std::ofstream::out | std::ofstream::trunc);
 	ofs10.close();
 	std::ofstream ofs11;
-	ofs11.open(pasta + "bests_sol_SSA.txt", std::ofstream::out | std::ofstream::trunc);
+	ofs11.open(pasta + "bests_sol_BAT.txt", std::ofstream::out | std::ofstream::trunc);
 	ofs11.close();
+	std::ofstream ofs12;
+	ofs12.open(pasta + "bests_sol_AOA.txt", std::ofstream::out | std::ofstream::trunc);
+	ofs12.close();
+	std::ofstream ofs13;
+	ofs13.open(pasta + "bests_sol_SSA.txt", std::ofstream::out | std::ofstream::trunc);
+	ofs13.close();
+	std::ofstream ofs14;
+	ofs14.open(pasta + "bests_sol_PSO.txt", std::ofstream::out | std::ofstream::trunc);
+	ofs14.close();
 }
 
 //Image plots

@@ -1,10 +1,5 @@
 //includes
 #include "bat.hpp"
-
-
-
-
-
 BAT::BAT(Benchmark *benchmark, unsigned int searchAgentsCount, unsigned int maximumIterations, std::vector<int>ind_val, std::vector<double> amp_sonora, std::vector<double> taxa, double lambda,
 	double alpha, double gama, double fmax, double fmin, double A0, double rf, double **positions_inicial, std::string pasta)
 {
@@ -35,7 +30,7 @@ BAT::BAT(Benchmark *benchmark, unsigned int searchAgentsCount, unsigned int maxi
 	vel_m = Utils::Create2DZeroArray(searchAgentsCount, benchmark_m->GetDimension());
 	x_score = Utils::Create1DArray(searchAgentsCount);
 	best_score = std::numeric_limits<double >::infinity();
-
+	Best_pos = Utils::Create1DZeroArray(dimension_m);// Inicialização da melhor posição encontrada
 
 }
 
@@ -46,16 +41,16 @@ BAT::~BAT() {
 	}
 	delete positions_m;
 	delete vel_m;
-	delete best_positions_m;
 	delete x_score;
+	delete Best_pos;
 	delete convergenceCurve_m;
 
 }
-void BAT::calculateFitness(std::vector<std::vector<std::vector<cv::KeyPoint>>> bestKey, std::vector<std::string> imagens_src, cv::Mat im360, int rows, int cols, std::vector<std::vector<int>> indices, double *best_pos,  int it)
+void BAT::calculateFitness(std::vector<std::vector<std::vector<cv::KeyPoint>>> bestKey, std::vector<std::string> imagens_src, cv::Mat im360, int rows, int cols, std::vector<std::vector<int>> indices,  int it)
 {
 	double fitness;
 
-//#pragma omp parallel for //morceguinhos
+	//#pragma omp parallel for //morceguinhos
 	for (register int agentIndex = 0; agentIndex < searchAgentsCount_m; agentIndex++)
 	{
 		double *positions_new = new double[dimension_m];
@@ -63,14 +58,14 @@ void BAT::calculateFitness(std::vector<std::vector<std::vector<cv::KeyPoint>>> b
 		for (register unsigned int variable = 0; variable < dimension_m; variable++) {
 
 
-			vel_m[agentIndex][variable] = vel_m[agentIndex][variable] + (best_pos[variable] - positions_m[agentIndex][variable])*f;//velocidade
+			vel_m[agentIndex][variable] = vel_m[agentIndex][variable] + (Best_pos[variable] - positions_m[agentIndex][variable])*f;//velocidade
 
 			positions_new[variable] = positions_m[agentIndex][variable] + vel_m[agentIndex][variable];
 
 		}
 
 		//etapa de busca local
-		if (Utils::GenerateRandomNumber() <r_m[agentIndex])
+		if (Utils::GenerateRandomNumber() < r_m[agentIndex])
 		{
 			for (register unsigned int variable = 0; variable < dimension_m; variable++) {
 				double mean_amp = std::accumulate(A_m.begin(), A_m.end(), 0.0) / A_m.size();
@@ -92,7 +87,9 @@ void BAT::calculateFitness(std::vector<std::vector<std::vector<cv::KeyPoint>>> b
 		/*accept candidate solution as current solution if better or if not better accept solution with some small probability*/
 
 		if (fitness <= x_score[agentIndex] && Utils::GenerateRandomNumber() < A_m[agentIndex]) {
-			positions_m[agentIndex] = positions_new;
+			//positions_m[agentIndex] = positions_new;
+			std::copy(&positions_new[0], &positions_new[dimension_m], &positions_m[agentIndex][0]);
+
 			x_score[agentIndex] = fitness;
 			r_m[agentIndex] = rf_m * (1 - exp(-gama_m * (it)));//atualiza a taxa de emissao de pulsos
 		}
@@ -100,37 +97,32 @@ void BAT::calculateFitness(std::vector<std::vector<std::vector<cv::KeyPoint>>> b
 		A_m[agentIndex] = alpha_m * A_m[agentIndex];//atualiza a amplitude sonora
 
 	}
-	//Update Alpha, Beta, and Delta
+	
+	best_score = std::numeric_limits<double >::infinity();
 
-	double best_score_new = std::numeric_limits<double >::infinity();
-	double *best_pos_new;
 	//melhor posição e melhor  fitness
 	for (int a = 0; a < searchAgentsCount_m; a++) {
-		if (x_score[a] < best_score_new) {
-			best_score_new = x_score[a];
-			best_pos_new = positions_m[a];
+		if (x_score[a] < best_score) {
+			best_score = x_score[a];
+			
+			std::copy(&positions_m[a][0], &positions_m[a][dimension_m], &Best_pos[0]);
+
 		}
 	}
-	best_pos = best_pos_new;
-	best_score = best_score_new;
+
 }
 
 void BAT::fitness_inicial(std::vector<std::vector<std::vector<cv::KeyPoint>>> bestKey, std::vector<std::string> imagens_src, cv::Mat im360, int rows, int cols, std::vector<std::vector<int>> indices) {
 	double fitness;
 
-//#pragma omp parallel for
+	//Avalia a população inicial
 	for (register int agentIndex = 0; agentIndex < searchAgentsCount_m; agentIndex++) {
 		Utils::Clip1DArray(positions_m[agentIndex], dimension_m, boundaries_m);
 
 		//Calculate objective function for each search agent
 
 		fitness = benchmark_m->fitness(positions_m[agentIndex], bestKey, imagens_src, im360, rows, cols, indices);
-
-		//Update Alpha, Beta, and Delta
-		if (fitness < x_score[agentIndex]) {
-			x_score[agentIndex] = fitness; // Update alpha
-			//std::copy(&positions_m[agentIndex][0], &positions_m[agentIndex][dimension_m], &alphaPosition_m[0]);
-		}
+		x_score[agentIndex] = fitness;
 
 
 	}
@@ -139,31 +131,30 @@ void BAT::fitness_inicial(std::vector<std::vector<std::vector<cv::KeyPoint>>> be
 
 double* BAT::Evaluate(bool debug, std::vector<std::vector<std::vector<cv::KeyPoint>>> bestKey, std::vector<std::string> imagens_src, cv::Mat im360, std::vector<std::vector<int>> indices) {
 	cv::Mat image1 = cv::imread(imagens_src[0]);
+	A_m[0] = A0_m;
+	
 	// A avalia a população inicial
 	fitness_inicial(bestKey, imagens_src, im360, image1.rows, image1.cols, indices);
-	A_m[0] = A0_m;
-	std::cout << "fit original" << x_score[0] << std::endl;
-	double *best_pos;
-	best_pos = new double[dimension_m];
-	//melhor posição e melhor  fitness
+	
+	//Encontra a melhor solução e sua pontuação
 	for (int a = 0; a < searchAgentsCount_m; a++)
 	{
 		if (x_score[a] < best_score)
 		{
 			best_score = x_score[a];
-			//best_pos = positions_m[a];
-			std::copy(&positions_m[a][0], &positions_m[a][dimension_m], &best_pos[0]);
+			std::copy(&positions_m[a][0], &positions_m[a][dimension_m], &Best_pos[0]);
 
 		}
 	}
-
+	convergenceCurve_m[0] = best_score;
 	auto start_time = std::chrono::high_resolution_clock::now();
-//#pragma omp parallel for
-	for (register int iteration = 0; iteration < maximumIterations_m; iteration++) {
 
-		calculateFitness(bestKey, imagens_src, im360, image1.rows, image1.cols, indices, best_pos, iteration);
+	//Contador de loop (iniciado com 1, já que uma avaliação de FOB foi feita)
+	for (register int iteration = 1; iteration < maximumIterations_m; iteration++) {
+
+		calculateFitness(bestKey, imagens_src, im360, image1.rows, image1.cols, indices,  iteration);
 		convergenceCurve_m[iteration] = best_score;
-		best_positions_m = best_pos;
+		
 		/*if (debug && (iteration % 1 == 0)) {
 			std::cout << "At iteration " << iteration << " the best fitness is "
 				<< std::setprecision(3)
@@ -178,7 +169,7 @@ double* BAT::Evaluate(bool debug, std::vector<std::vector<std::vector<cv::KeyPoi
 	return convergenceCurve_m;
 }
 double* BAT::GetBestPositionBAT() {
-	return best_positions_m;
+	return Best_pos;
 }
 double BAT::GetBestScore() {
 	return best_score;
@@ -195,12 +186,12 @@ std::ostream& operator << (std::ostream& os, const BAT *bat) {
 	bests_sol.open(path + "bests_sol_BAT.txt", std::fstream::app);
 	for (register unsigned int variable = 0; variable < bat->dimension_m; variable++) {
 		//os << bat->best_positions_m[variable] << " ";
-		bests_sol << bat->best_positions_m[variable] << " ";
+		bests_sol << bat->Best_pos[variable] << " ";
 	}
 	bests_sol << "\n";
 	bests_sol.close();
 	//MELHOR FITNESS
-	os 	<< "  BAT (Fitness) = " << bat->best_score << std::endl
+	os << "  BAT (Fitness) = " << bat->best_score << std::endl
 		<< "  Time = " << bat->executionTime_m << " seconds";
 
 	//melhores fitness em cada simulação

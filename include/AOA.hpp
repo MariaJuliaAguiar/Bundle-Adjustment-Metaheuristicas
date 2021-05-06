@@ -27,7 +27,7 @@ private:
 	double u_m;
 	
 	double *x_score;
-	double epsilon = 1 * 10 ^ -6;
+	double epsilon;
 	//Initialize the positions of search agents
 	double **positions_m;
 	double *convergenceCurve_m;
@@ -35,7 +35,9 @@ private:
 	double **best_posind;
 	double *best_solind;
 	double *best_positions_m;
-	void calculateFitness(std::vector<std::vector<std::vector<cv::KeyPoint>>> bestKey, std::vector<std::string> imagens_src, cv::Mat im360, int rows, int cols, std::vector<std::vector<int>> indices, double *best_pos, int it,double MOA, double MOP);
+	double *Best_pos;
+
+	void calculateFitness(std::vector<std::vector<std::vector<cv::KeyPoint>>> bestKey, std::vector<std::string> imagens_src, cv::Mat im360, int rows, int cols, std::vector<std::vector<int>> indices, int it,double MOA, double MOP);
 	void fitness_inicial(std::vector<std::vector<std::vector<cv::KeyPoint>>> bestKey, std::vector<std::string> imagens_src, cv::Mat im360, int rows, int cols, std::vector<std::vector<int>> indices);
 
 
@@ -43,8 +45,9 @@ public:
 	AOA::AOA(Benchmark *benchmark, unsigned int searchAgentsCount, unsigned int maximumIterations, std::vector<int>ind_val, std::vector<double> media_inter, std::vector<double> melhor_inter, std::vector<double> MOA, double max_MOA, double min_MOA, std::vector<double> MOP, double alpha_MOP, double u, double **positions_inicial, std::string pasta);
 	~AOA();
 	double *Evaluate(bool debug, std::vector<std::vector<std::vector<cv::KeyPoint>>> bestKey, std::vector<std::string> imagens_src, cv::Mat im360, std::vector<std::vector<int>> indices);
+	double mean(double arr[], int n);
 	double *GetBestPositionAOA();
-	double AOA::GetBestScore();
+	double GetBestScore();
 	/*double *GetBetaPosition();
 	double GetBetaScore();
 	double *GetDeltaPosition();

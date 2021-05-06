@@ -21,12 +21,13 @@ AOA::AOA(Benchmark *benchmark, unsigned int searchAgentsCount, unsigned int maxi
 	MOP_m = MOP;
 	alpha_MOP_m = alpha_MOP;
 	u_m = u;
-
+	epsilon = 0.000001;
 	//Initialize the positions of search agents
 	positions_m = Utils::inicialization(searchAgentsCount_m, dimension_m, positions_inicial);
-
+	best_solind = Utils::Create1DArray(searchAgentsCount);
 	x_score = Utils::Create1DArray(searchAgentsCount);
 	best_score = std::numeric_limits<double >::infinity();
+	Best_pos = Utils::Create1DZeroArray(dimension_m);// Inicialização da melhor posição encontrada
 
 }
 
@@ -35,7 +36,7 @@ AOA::~AOA() {
 		delete positions_m[agentId];
 	}
 	delete positions_m;
-	delete best_positions_m;
+	delete Best_pos;
 	delete x_score;
 	delete convergenceCurve_m;
 }
@@ -60,7 +61,7 @@ void AOA::fitness_inicial(std::vector<std::vector<std::vector<cv::KeyPoint>>> be
 	}
 
 }
-void AOA::calculateFitness(std::vector<std::vector<std::vector<cv::KeyPoint>>> bestKey, std::vector<std::string> imagens_src, cv::Mat im360, int rows, int cols, std::vector<std::vector<int>> indices, double *best_pos, int it, double MOA, double MOP)
+void AOA::calculateFitness(std::vector<std::vector<std::vector<cv::KeyPoint>>> bestKey, std::vector<std::string> imagens_src, cv::Mat im360, int rows, int cols, std::vector<std::vector<int>> indices,  int it, double MOA, double MOP)
 {
 
 	double fitness;
@@ -80,12 +81,12 @@ void AOA::calculateFitness(std::vector<std::vector<std::vector<cv::KeyPoint>>> b
 				//BUSCA GLOBAL
 				if (r2[variable] > 0.5)
 				{
-					positions_m[agentIndex][variable] = best_pos[variable] / ((MOP + epsilon)*((boundaries_m[variable].upperBound - boundaries_m[variable].lowerBound)*u_m + boundaries_m[variable].lowerBound));
+					positions_m[agentIndex][variable] = Best_pos[variable] / ((MOP + epsilon)*((boundaries_m[variable].upperBound - boundaries_m[variable].lowerBound)*u_m + boundaries_m[variable].lowerBound));
 
 				}
 				else
 				{
-					positions_m[agentIndex][variable] = best_pos[variable] * MOP *((boundaries_m[variable].upperBound - boundaries_m[variable].lowerBound)*u_m + boundaries_m[variable].lowerBound);
+					positions_m[agentIndex][variable] = Best_pos[variable] * MOP *((boundaries_m[variable].upperBound - boundaries_m[variable].lowerBound)*u_m + boundaries_m[variable].lowerBound);
 				}
 
 			}
@@ -93,11 +94,11 @@ void AOA::calculateFitness(std::vector<std::vector<std::vector<cv::KeyPoint>>> b
 			{
 				if (r3[variable] > 0.5)
 				{
-					positions_m[agentIndex][variable] = best_pos[variable] - MOP * ((boundaries_m[variable].upperBound - boundaries_m[variable].lowerBound)*u_m + boundaries_m[variable].lowerBound);
+					positions_m[agentIndex][variable] = Best_pos[variable] - MOP * ((boundaries_m[variable].upperBound - boundaries_m[variable].lowerBound)*u_m + boundaries_m[variable].lowerBound);
 				}
 				else
 				{
-					positions_m[agentIndex][variable] = best_pos[variable] + MOP * ((boundaries_m[variable].upperBound - boundaries_m[variable].lowerBound)*u_m + boundaries_m[variable].lowerBound);
+					positions_m[agentIndex][variable] = Best_pos[variable] + MOP * ((boundaries_m[variable].upperBound - boundaries_m[variable].lowerBound)*u_m + boundaries_m[variable].lowerBound);
 				}
 
 			}
@@ -112,7 +113,7 @@ void AOA::calculateFitness(std::vector<std::vector<std::vector<cv::KeyPoint>>> b
 		//Calculate objective function for  new bat
 
 		fitness = benchmark_m->fitness(positions_m[agentIndex], bestKey, imagens_src, im360, rows, cols, indices);
-
+		x_score[agentIndex] = fitness;
 
 		//Etapa de busca global
 		/*accept candidate solution as current solution if better or if not better accept solution with some small probability*/
@@ -120,13 +121,14 @@ void AOA::calculateFitness(std::vector<std::vector<std::vector<cv::KeyPoint>>> b
 		if (abs(fitness) < abs(best_solind[agentIndex]))
 		{
 			best_solind[agentIndex] = fitness;
-			//best_posind[agentIndex] = positions_m[agentIndex];
+			//Best_posind[agentIndex] = positions_m[agentIndex];
 			std::copy(&positions_m[agentIndex][0], &positions_m[agentIndex][dimension_m], &best_posind[agentIndex][0]);
 			if (abs(best_solind[agentIndex]) < abs(best_score))
 			{
 				best_score = best_solind[agentIndex];
-				best_pos = best_posind[agentIndex];
-
+				std::copy(&best_posind[agentIndex][0], &best_posind[agentIndex][dimension_m], &Best_pos[0]);
+				//Best_pos = best_posind[agentIndex];
+				//std::cout << "passei aqui";
 
 			}
 
@@ -135,47 +137,56 @@ void AOA::calculateFitness(std::vector<std::vector<std::vector<cv::KeyPoint>>> b
 	}
 
 }
+double AOA::mean(double arr[], int n)
+{
+	double mean = 0; // initialize sum
 
+	// Iterate through all elements
+	// and add them to sum
+	for (int i = 0; i < n; i++) {
+		mean += arr[i];
+	}
+		
+
+	return mean / n;
+}
 double* AOA::Evaluate(bool debug, std::vector<std::vector<std::vector<cv::KeyPoint>>> bestKey, std::vector<std::string> imagens_src, cv::Mat im360, std::vector<std::vector<int>> indices) {
 	cv::Mat image1 = cv::imread(imagens_src[0]);
 	// A avalia a população inicial
 	fitness_inicial(bestKey, imagens_src, im360, image1.rows, image1.cols, indices);
-	std::cout << "fit original " << x_score[0] << std::endl;
-
-	double *best_pos;
-	best_pos = new double[dimension_m];
-	double mean_x_score = 0;
+	
+	  
 	//melhor posição e melhor  fitness
 	for (int a = 0; a < searchAgentsCount_m; a++)
 	{
 		if (x_score[a] < best_score)
 		{
 			best_score = x_score[a];
-			//best_pos = positions_m[a];
-			std::copy(&positions_m[a][0], &positions_m[a][dimension_m], &best_pos[0]);
+			std::copy(&positions_m[a][0], &positions_m[a][dimension_m], &Best_pos[0]);
 
 		}
-		mean_x_score += x_score[a];
+		
 	}
 	best_posind = Utils::inicialization(searchAgentsCount_m, dimension_m, positions_m);
-	best_solind = x_score;
+	//best_solind = x_score;
+	std::copy(&x_score[0], &x_score[searchAgentsCount_m], &best_solind[0]);
 
-	mean_x_score = mean_x_score / searchAgentsCount_m;
+	
 
 	auto start_time = std::chrono::high_resolution_clock::now();
-//#pragma omp parallel for
+
 	for (register int iteration = 0; iteration < maximumIterations_m; iteration++) {
-
-
-		media_inter_m[iteration] = mean_x_score;
+	
+		
+		media_inter_m[iteration] = mean(x_score, searchAgentsCount_m);
 		melhor_inter_m[iteration] = best_score;
 		MOA_m[iteration] = min_MOA_m + iteration * ((max_MOA_m - min_MOA_m) / maximumIterations_m);
 		MOP_m[iteration] = 1 - (pow(iteration, (1 / alpha_MOP_m)) / pow(maximumIterations_m, (1 / alpha_MOP_m)));
 		
-		calculateFitness(bestKey, imagens_src, im360, image1.rows, image1.cols, indices, best_pos, iteration, MOA_m[iteration], MOP_m[iteration]);
+		calculateFitness(bestKey, imagens_src, im360, image1.rows, image1.cols, indices,  iteration, MOA_m[iteration], MOP_m[iteration]);
 
 		convergenceCurve_m[iteration] = best_score;
-		best_positions_m = best_pos;
+	
 
 		/*if (debug && (iteration % 1 == 0)) {
 			std::cout << "At iteration " << iteration << " the best fitness is "
@@ -191,7 +202,7 @@ double* AOA::Evaluate(bool debug, std::vector<std::vector<std::vector<cv::KeyPoi
 	return convergenceCurve_m;
 }
 double* AOA::GetBestPositionAOA() {
-	return best_positions_m;
+	return Best_pos;
 }
 double AOA::GetBestScore() {
 	return best_score;
@@ -209,8 +220,8 @@ std::ostream& operator << (std::ostream& os, const AOA *aoa) {
 	//os << std::scientific << std::setprecision(9) <<"AOA position = ";
 
 	for (register unsigned int variable = 0; variable < aoa->dimension_m; variable++) {
-		//os << aoa->best_positions_m[variable] << " ";
-		bests_sol << aoa->best_positions_m[variable] << " ";
+		//os << aoa->Best_positions_m[variable] << " ";
+		bests_sol << aoa->Best_pos[variable] << " ";
 	}
 	bests_sol << "\n";
 	bests_sol.close();

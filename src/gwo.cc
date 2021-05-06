@@ -59,7 +59,7 @@ GWO::~GWO() {
 void GWO::calculateFitness(std::vector<std::vector<std::vector<cv::KeyPoint>>> bestKey, std::vector<std::string> imagens_src, cv::Mat im360, int rows, int cols, std::vector<std::vector<int>> indices) {
 	double fitness;
 	
-#pragma omp parallel for
+//#pragma omp parallel for
 	for (register int agentIndex = 0; agentIndex < searchAgentsCount_m; agentIndex++) {
 		Utils::Clip1DArray(positions_m[agentIndex], dimension_m, boundaries_m);
 
