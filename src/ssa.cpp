@@ -21,6 +21,7 @@ SSA::SSA(Benchmark *benchmark, unsigned int searchAgentsCount, unsigned int maxi
 	x_score = Utils::Create1DArray(searchAgentsCount);
 	
 	best_score = std::numeric_limits<double >::infinity();
+	best_pos = Utils::Create1DZeroArray(dimension_m);// Inicialização da melhor posição encontrada
 
 }
 
@@ -29,7 +30,7 @@ SSA::~SSA() {
 		delete positions_m[agentId];
 	}
 	delete positions_m;
-	delete best_positions_m;
+	delete best_pos;
 	delete x_score;
 	delete convergenceCurve_m;
 }
@@ -56,11 +57,11 @@ void SSA::fitness_inicial(std::vector<std::vector<std::vector<cv::KeyPoint>>> be
 
 	
 }
-void SSA::calculateFitness(std::vector<std::vector<std::vector<cv::KeyPoint>>> bestKey, std::vector<std::string> imagens_src, cv::Mat im360, int rows, int cols, std::vector<std::vector<int>> indices, double *best_pos,  int it, double c1)
+void SSA::calculateFitness(std::vector<std::vector<std::vector<cv::KeyPoint>>> bestKey, std::vector<std::string> imagens_src, cv::Mat im360, int rows, int cols, std::vector<std::vector<int>> indices,  int it, double c1)
 {
 	double fitness;
 	double W = 1;
-#pragma omp parallel for //morceguinhos
+//#pragma omp parallel for //morceguinhos
 	for (register int agentIndex = 0; agentIndex < searchAgentsCount_m; agentIndex++)
 	{
 
@@ -93,7 +94,7 @@ void SSA::calculateFitness(std::vector<std::vector<std::vector<cv::KeyPoint>>> b
 
 
 	}
-#pragma omp parallel for //morceguinhos
+//#pragma omp parallel for //morceguinhos
 	for (register int agentIndex = 0; agentIndex < searchAgentsCount_m; agentIndex++)
 	{
 		int *IndUB = new int[dimension_m];
@@ -137,7 +138,9 @@ void SSA::calculateFitness(std::vector<std::vector<std::vector<cv::KeyPoint>>> b
 		if (fitness <= best_score)
 		{
 			best_score = fitness;
-			best_pos = positions_m[agentIndex];
+			//best_pos = positions_m[agentIndex];
+			std::copy(&positions_m[agentIndex][0], &positions_m[agentIndex][dimension_m], &best_pos[0]);
+
 		}
 
 	}
@@ -152,7 +155,7 @@ double* SSA::Evaluate(bool debug, std::vector<std::vector<std::vector<cv::KeyPoi
 	fitness_inicial(bestKey, imagens_src, im360, image1.rows, image1.cols, indices);
 	
 	
-	double *best_pos;
+	
 	double *x_score_ordenado;
 
 	std::vector<int>Ind_Salp_Ordenado;
@@ -168,20 +171,19 @@ double* SSA::Evaluate(bool debug, std::vector<std::vector<std::vector<cv::KeyPoi
 
 	}
 	best_score = x_score_ordenado[0];
-	//best_pos = positions_Salp_Ordenado[0];
-	best_pos = new double[dimension_m];
+	convergenceCurve_m[0] = best_score;
 	std::copy(&positions_Salp_Ordenado[0][0], &positions_Salp_Ordenado[0][dimension_m], &best_pos[0]);
 
 	auto start_time = std::chrono::high_resolution_clock::now();
 //#pragma omp parallel for
-	for (register int iteration = 0; iteration < maximumIterations_m; iteration++) {
+	for (register int iteration = 1; iteration < maximumIterations_m; iteration++) {
 
 		double c1 = 2 * exp(-pow(4 * (iteration / maximumIterations_m), 2));
 
-		calculateFitness(bestKey, imagens_src, im360, image1.rows, image1.cols, indices, best_pos, iteration, c1);
+		calculateFitness(bestKey, imagens_src, im360, image1.rows, image1.cols, indices,  iteration, c1);
 
 		convergenceCurve_m[iteration] = best_score;
-		best_positions_m = best_pos;
+	
 
 		/*if (debug && (iteration % 1 == 0)) {
 			std::cout << "At iteration " << iteration << " the best fitness is "
@@ -198,7 +200,7 @@ double* SSA::Evaluate(bool debug, std::vector<std::vector<std::vector<cv::KeyPoi
 }
 
 double* SSA::GetBestPositionSSA() {
-	return best_positions_m;
+	return best_pos;
 }
 
 double SSA::GetBestScore() {
@@ -218,7 +220,7 @@ std::ostream& operator << (std::ostream& os, const SSA *ssa) {
 
 	for (register unsigned int variable = 0; variable < ssa->dimension_m; variable++) {
 	//	os << ssa->best_positions_m[variable] << " ";
-		bests_sol << ssa->best_positions_m[variable] << " ";
+		bests_sol << ssa->best_pos[variable] << " ";
 	}
 	bests_sol << "\n";
 	bests_sol.close();

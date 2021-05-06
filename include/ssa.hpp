@@ -19,14 +19,14 @@ private:
 	
 
 	double *x_score;
-	
+	double *best_pos;
 	//Initialize the positions of search agents
 	double **positions_m;
 	double *convergenceCurve_m;
 	double best_score;
-	double *best_positions_m;
 
-	void calculateFitness(std::vector<std::vector<std::vector<cv::KeyPoint>>> bestKey, std::vector<std::string> imagens_src, cv::Mat im360, int rows, int cols, std::vector<std::vector<int>> indices, double *best_pos,  int it, double c1);
+
+	void calculateFitness(std::vector<std::vector<std::vector<cv::KeyPoint>>> bestKey, std::vector<std::string> imagens_src, cv::Mat im360, int rows, int cols, std::vector<std::vector<int>> indices,  int it, double c1);
 	void fitness_inicial(std::vector<std::vector<std::vector<cv::KeyPoint>>> bestKey, std::vector<std::string> imagens_src, cv::Mat im360, int rows, int cols, std::vector<std::vector<int>> indices);
 
 
