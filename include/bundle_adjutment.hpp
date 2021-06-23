@@ -18,15 +18,15 @@ struct ReprojectionError
 		//// X' = R*X + t
 		
 		//ceres::AngleAxisRotatePoint(camera, point, X);
-		Eigen::Matrix<T, 3, 3> Ri; //rotation matrix
-		Eigen::Matrix<T, 3, 3> Rj;
+		Eigen::Matrix<T,3,3> Ri; //rotation matrix
+		Eigen::Matrix<T,3,3> Rj;
 		T camera_euler_angles[3];
 		T camera_euler_angles1[3];
-		camera_euler_angles[0]= -camera[0];
-		camera_euler_angles[1]= -camera[ 1];
+		camera_euler_angles[0]= -camera[frame0 * 6];
+		camera_euler_angles[1]= -camera[frame0 * 6+1];
 		camera_euler_angles[2] = T{0};
-		camera_euler_angles1[0] = -camera[6];//-T{ pose[(frame1 * 6)] };
-		camera_euler_angles1[1] = -camera[7];//- T{ pose[(frame1 * 6) + 1] };
+		camera_euler_angles1[0] = -camera[frame1 * 6 ];//-T{ pose[(frame1 * 6)] };
+		camera_euler_angles1[1] = -camera[frame1 * 6 +1];//- T{ pose[(frame1 * 6) + 1] };
 		camera_euler_angles1[2] = T{ 0 };
 		T R[9];
 		T R1[9];
@@ -41,15 +41,15 @@ struct ReprojectionError
 			R1[3], R1[4], R1[5],
 			R1[6], R1[7], R1[8];
 		/*cout << Rj;*/
-		const T& cx1 = camera[4];//T{ pose[(frame1 * 6) + 4] }; //mera[4];
-		const T& cy1 = camera[5];// T{ pose[(frame1 * 6) + 5] };//mera[5];
-		const T& fx1 = camera[2];//T{ pose[(frame1 * 6) + 2] };//mera[2];
-		const T& fy1 = camera[3];//T{ pose[(frame1 * 6) + 3] };//camera[3];
+		const T& cx1 = camera[frame0 * 6 + 4];//T{ pose[(frame1 * 6) + 4] }; //mera[4];
+		const T& cy1 = camera[frame0 * 6 + 5];// T{ pose[(frame1 * 6) + 5] };//mera[5];
+		const T& fx1 = camera[frame0 * 6 + 2];//T{ pose[(frame1 * 6) + 2] };//mera[2];
+		const T& fy1 = camera[frame0 * 6 + 3];//T{ pose[(frame1 * 6) + 3] };//camera[3];
 
-		const T& cx2 = camera[10];//T{ pose[(frame1 * 6) + 4] };
-		const T& cy2 = camera[11];//T{ pose[(frame1 * 6) + 5] };
-		const T& fx2 = camera[8]; //T{ pose[(frame1 * 6) + 2] };
-		const T& fy2 = camera[9]; //T{ pose[(frame1 * 6) + 3] };
+		const T& cx2 = camera[frame1 * 6 + 4];//T{ pose[(frame1 * 6) + 4] };
+		const T& cy2 = camera[frame1 * 6 + 5];//T{ pose[(frame1 * 6) + 5] };
+		const T& fx2 = camera[frame1 * 6 + 2]; //T{ pose[(frame1 * 6) + 2] };
+		const T& fy2 = camera[frame1 * 6 + 3]; //T{ pose[(frame1 * 6) + 3] };
 		Eigen::Matrix<T, 3, 3>  Ki, Kj;
 		
 		Ki(0) = fx1;
@@ -137,7 +137,7 @@ struct ReprojectionError
 
 	static ceres::CostFunction* create(const Eigen::Vector3d& _kpts1, Eigen::Vector3d& _kpts2, int _frame0,int _frame1, int _h, int _w, double* _pose)
 	{
-		return (new ceres::AutoDiffCostFunction<ReprojectionError, 2, 12>(new ReprojectionError(_kpts1, _kpts2, _frame0, _frame1,_h,_w,_pose)));
+		return (new ceres::AutoDiffCostFunction<ReprojectionError, 2, 336>(new ReprojectionError(_kpts1, _kpts2, _frame0, _frame1,_h,_w,_pose)));
 	}
 
 private:

@@ -147,7 +147,7 @@ double* BAT::Evaluate(bool debug, std::vector<std::vector<std::vector<cv::KeyPoi
 		}
 	}
 	convergenceCurve_m[0] = best_score;
-	auto start_time = std::chrono::high_resolution_clock::now();
+	//auto start_time = std::chrono::high_resolution_clock::now();
 
 	//Contador de loop (iniciado com 1, já que uma avaliação de FOB foi feita)
 	for (register int iteration = 1; iteration < maximumIterations_m; iteration++) {
@@ -163,8 +163,8 @@ double* BAT::Evaluate(bool debug, std::vector<std::vector<std::vector<cv::KeyPoi
 
 	}
 
-	auto finish_time = std::chrono::high_resolution_clock::now();
-	executionTime_m = std::chrono::duration_cast<std::chrono::nanoseconds>(finish_time - start_time).count() * 1e-9;
+	//auto finish_time = std::chrono::high_resolution_clock::now();
+	//executionTime_m = std::chrono::duration_cast<std::chrono::nanoseconds>(finish_time - start_time).count() * 1e-9;
 
 	return convergenceCurve_m;
 }
@@ -191,8 +191,8 @@ std::ostream& operator << (std::ostream& os, const BAT *bat) {
 	bests_sol << "\n";
 	bests_sol.close();
 	//MELHOR FITNESS
-	os << "  BAT (Fitness) = " << bat->best_score << std::endl
-		<< "  Time = " << bat->executionTime_m << " seconds";
+	//os << "  BAT (Fitness) = " << bat->best_score << std::endl
+	//	<< "  Time = " << bat->executionTime_m << " seconds";
 
 	//melhores fitness em cada simulação
 	std::fstream bests_fit;

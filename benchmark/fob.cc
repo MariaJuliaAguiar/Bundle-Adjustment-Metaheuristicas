@@ -22,6 +22,7 @@
 #include <opencv2\highgui\highgui.hpp>
 #include <opencv2\core\core.hpp>
 #include <opencv\cv.hpp>
+#include <numeric>
 Benchmark* fob::Create(std::vector<double> lb, std::vector<double> up) {
 
 	return new fob(lb, up);
@@ -50,63 +51,55 @@ fob::~fob() {
 
 //fob mais nova - Vinicius
 double fob::fitness(double x[], std::vector<std::vector<std::vector<cv::KeyPoint>>> bestKey, std::vector<std::string> imagens_src, cv::Mat im360, int rows, int cols, std::vector<std::vector<int>> indices) {
-
-	//auto start_time = std::chrono::high_resolution_clock::now();
-
-	//double erro = 0;
-	std::vector<double> erro;
-	erro.resize(bestKey.size());
-
 	int w = 3599;
 	int h = 1799;
-	//w = 10000; h = 10000;
+
 	double avg = 0;
-	std::vector<Eigen::Vector2d> errors;
-	cv::Mat imh=	cv::Mat::zeros(cv::Size(w, h), CV_8UC3);
-	std::vector< Eigen::Vector3d> features_ref;
-	std::vector< Eigen::Vector3d> features_es;
+
+
 	//#pragma omp parallel for 
 	for (int frame0 = 0; frame0 < bestKey.size(); frame0++)
 	{
 
-		erro[frame0] = 0;
+
 		int l = 0;
+
+		//focos e centros oticos da imagem de referencia 
+		double fx1 = x[(frame0 * 6) + 2];
+		double fy1 = x[(frame0 * 6) + 3];
+		double cx1 = x[(frame0 * 6) + 4];
+		double cy1 = x[(frame0 * 6) + 5];
+		Eigen::Matrix3d  Ki;
+		//Matriz intrinsica da imagem de referencia 
+		Ki << fx1, 0, cx1,
+			0, fy1, cy1,
+			0, 0, 1;
+
+		// angulos de pan e tilt  da imagem de referencia 
+		double pan = x[(frame0 * 6) + 1];
+		double tilt = x[frame0 * 6];
+		// Matriz de rotação da imagem de referencia 
+		Eigen::Matrix3d Ri;
+		Ri = Eigen::AngleAxisd(-DEG2RAD(pan), Eigen::Vector3d::UnitY()) * Eigen::AngleAxisd(-DEG2RAD(tilt), Eigen::Vector3d::UnitX());
 
 		for (int j = 0; j < bestKey[frame0].size(); j++)
 		{
+			//Matches
 			std::vector<cv::KeyPoint> kpts1 = bestKey[frame0][j];
 			std::vector<cv::KeyPoint> kpts2 = bestKey[frame0][j + 1];
 			int frame1 = indices[frame0][l];
-			Eigen::Matrix3d  Ki, Kj;
-			//focos e centros oticos da imagem de referencia 
-			double fx1 = x[(frame0 * 6) + 2];
-			double fy1 = x[(frame0 * 6) + 3];
-			double cx1 = x[(frame0 * 6) + 4];
-			double cy1 = x[(frame0 * 6) + 5];
-			//Matriz intrinsica da imagem de referencia 
-			Ki << fx1, 0, cx1,
-				0, fy1, cy1,
-				0, 0, 1;
+			
 			//focos e centros oticos 
 			double fx2 = x[(frame1 * 6) + 2];
 			double fy2 = x[(frame1 * 6) + 3];
 			double cx2 = x[(frame1 * 6) + 4];
 			double cy2 = x[(frame1 * 6) + 5];
-
+	
 			//Matriz intrinsica
+			Eigen::Matrix3d   Kj;
 			Kj << fx2, 0, cx2,
 				0, fy2, cy2,
 				0, 0, 1;
-
-			
-
-
-			// angulos de pan e tilt  da imagem de referencia 
-			double pan = x[(frame0 * 6) + 1];
-			double tilt = x[frame0 * 6];
-			// Matriz de rotação da imagem de referencia 
-			Eigen::Matrix3d Ri;
-			Ri = Eigen::AngleAxisd(-DEG2RAD(pan), Eigen::Vector3d::UnitY()) * Eigen::AngleAxisd(-DEG2RAD(tilt), Eigen::Vector3d::UnitX());
 
 
 			Eigen::Matrix3d Rj;
@@ -122,8 +115,10 @@ double fob::fitness(double x[], std::vector<std::vector<std::vector<cv::KeyPoint
 
 			Eigen::Matrix3d H;
 			H = Ki * Ri.transpose()*Rj * (Kj).inverse();
+
+			//Matriz de Homografia - Identidade
 			Eigen::Matrix3d HI;
-			HI = Ki * Ri.transpose()*Ri * (Kj).inverse();;
+			HI = Ki * Ri.transpose()*Ri * (Kj).inverse();
 
 			if (bestKey[frame0][j].size() > 0)
 			{
@@ -161,9 +156,6 @@ double fob::fitness(double x[], std::vector<std::vector<std::vector<cv::KeyPoint
 						pij(0) = 3598;
 					}
 
-
-					//Matriz de homografia da imagem de referencia - Igual a Identidade 
-					
 					// Ponto no frustrum 3D correspondente a feature na imagem 1 em 2D
 					pe1 << kp1.pt.x, kp1.pt.y, 1;
 
@@ -191,91 +183,14 @@ double fob::fitness(double x[], std::vector<std::vector<std::vector<cv::KeyPoint
 					{
 						uki(0) = 3598;
 					}
-					
-					features_ref.push_back(uki);
-					 features_es.push_back(pij);
+
+
 					//  formando a FOB com o somatorio do erro entre os pontos
 					Eigen::Vector3d e = uki - pij;//residuo
-					//if (e.norm() > 15) {
-					//	//avg += 50 *(pow(e.norm(), 2));
-					//	avg += 1000 * e.norm();
-					//}
-					//else {
-						avg += pow(e.norm(), 2);
-						//avg +=  e.norm();
-					/*}*/
-				
-					//avg += e.norm();
+
+					avg += pow(e.norm(), 2);
+
 				}
-				//cv::Mat im = cv::imread(imagens_src[frame0]);
-				//cv::Mat im1 = cv::imread(imagens_src[frame1]);
-				//for (int v = 0; v < im.rows; v++)
-				//{ // Vai criando o frustrum a partir dos cantos da imagem
-				//	for (int u = 0; u < im.cols; u++)
-				//	{
-
-
-				//		Eigen::Vector3d P3D, p, P3D1 ;
-				//		Eigen::Vector3d pe, pe1;
-				//		p << u, v, 1;
-				//		P3D = HI * p;
-				//		P3D1 = H * p;
-
-				//		pe(0) = (P3D(0) / P3D(2)) + (w / 2);
-				//		pe(1) = (P3D(1) / P3D(2)) + (h / 2);
-				//		pe(2) = (P3D(2) / P3D(2));
-
-				//		pe1(0) = (P3D1(0) / P3D1(2)) + (w / 2);
-				//		pe1(1) = (P3D1(1) / P3D1(2)) + (h / 2);
-				//		pe1(2) = (P3D1(2) / P3D1(2));
-				//		for (int i = 0; i < 3; i++)
-				//		{
-				//			if (pe(i) < 0) {
-				//				pe(i) = 0;
-				//			}
-				//		
-				//		}
-
-
-				//		if (pe(1) >= h)
-				//		{
-				//			pe(1) = h-1;
-				//		}
-				//		if (pe(0) >= w)
-				//		{
-				//			pe(0) =w-1;
-				//		}
-				//		for (int i = 0; i < 3; i++)
-				//		{
-				//			if (pe1(i) < 0) {
-				//				pe1(i) = 0;
-				//			}
-
-				//		}
-
-
-				//		if (pe1(1) >= h)
-				//		{
-				//			pe1(1) =h-1;
-				//		}
-				//		if (pe1(0) >= w)
-				//		{
-				//			pe1(0) =w-1;
-				//		}
-
-				//		imh.at < cv::Vec3b > (cv::Point(pe(0), pe(1))) = im.at<cv::Vec3b>(cv::Point(u, v));
-				//		imh.at < cv::Vec3b >(cv::Point(pe1(0), pe1(1))) = im1.at<cv::Vec3b>(cv::Point(u, v));
-				//		
-				//	}
-
-				//}
-
-				//for (int i = 0; i < features_es.size();i++) {
-				//	int r = rand() % 255, b = rand() % 255, g = rand() % 255;
-				//	circle(imh, cv::Point(features_es[i][0], features_es[i][1]), 3, cv::Scalar(255, 0, 0), cv::FILLED, cv::LINE_8);
-				//	circle(imh, cv::Point(features_ref[i][0], features_ref[i][1]), 3, cv::Scalar(0, 255, 0), cv::FILLED, cv::LINE_8);
-				//}
-				//imwrite( "C:/dataset3/teste/imagem_esferic_GWO.png", imh);
 
 			}
 			l++;
@@ -284,17 +199,7 @@ double fob::fitness(double x[], std::vector<std::vector<std::vector<cv::KeyPoint
 
 	}
 	double erroT;
-	/*std::vector< Eigen::Vector3d> tot;
-	tot.resize(10);
-	for (int i = 0; i < 10;i++) {
-		tot[i] = features_ref[i] - features_es[i];
-	}*/
-	
-	//imwrite( "C:/dataset3/teste/imagem_esferic_GWO.png", imh);
 	erroT = avg;
-	
-	//auto finish_time = std::chrono::high_resolution_clock::now();
-	//auto time = std::chrono::duration_cast<std::chrono::nanoseconds>(finish_time - start_time).count() * 1e-9;
-	//std::cout <<"fob "<< time<<"\n";
+
 	return erroT;
 }

@@ -133,7 +133,8 @@ double* GWO::Evaluate(bool debug, std::vector<std::vector<std::vector<cv::KeyPoi
 
 	auto start_time = std::chrono::high_resolution_clock::now();
 //#pragma omp parallel for
-	for (register int iteration = 0; iteration < maximumIterations_m; iteration++) {
+	for (register int iteration = 0; iteration < maximumIterations_m; iteration++) 
+	{
 
 		calculateFitness(bestKey, imagens_src, im360, image1.rows, image1.cols, indices);
 
@@ -188,6 +189,7 @@ double GWO::GetExecutionTime() {
 std::ostream& operator << (std::ostream& os, const GWO *gwo) {
 
 //Salvar resultados em arquivos de textos
+
 	std::string path = gwo->pasta_m;
 
 	//Melhores soluções de cada simulação
@@ -203,8 +205,8 @@ std::ostream& operator << (std::ostream& os, const GWO *gwo) {
 	}
 	bests_sol << "\n";
 	bests_sol.close();
-	os << "  GWO score (Fitness) = " << gwo->alphaScore_m << std::endl
-		<< "  Time = " << gwo->executionTime_m << " seconds";
+	//os << "  GWO score (Fitness) = " << gwo->alphaScore_m << std::endl;
+	/*	<< "  Time = " << gwo->executionTime_m << " seconds";*/
 
 	//melhores fitness em cada simulação
 	std::fstream bests_fit;

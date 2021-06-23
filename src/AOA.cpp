@@ -127,8 +127,7 @@ void AOA::calculateFitness(std::vector<std::vector<std::vector<cv::KeyPoint>>> b
 			{
 				best_score = best_solind[agentIndex];
 				std::copy(&best_posind[agentIndex][0], &best_posind[agentIndex][dimension_m], &Best_pos[0]);
-				//Best_pos = best_posind[agentIndex];
-				//std::cout << "passei aqui";
+				
 
 			}
 
@@ -173,7 +172,7 @@ double* AOA::Evaluate(bool debug, std::vector<std::vector<std::vector<cv::KeyPoi
 
 	
 
-	auto start_time = std::chrono::high_resolution_clock::now();
+	/*auto start_time = std::chrono::high_resolution_clock::now();*/
 
 	for (register int iteration = 0; iteration < maximumIterations_m; iteration++) {
 	
@@ -196,8 +195,8 @@ double* AOA::Evaluate(bool debug, std::vector<std::vector<std::vector<cv::KeyPoi
 
 	}
 
-	auto finish_time = std::chrono::high_resolution_clock::now();
-	executionTime_m = std::chrono::duration_cast<std::chrono::nanoseconds>(finish_time - start_time).count() * 1e-9;
+	/*auto finish_time = std::chrono::high_resolution_clock::now();
+	executionTime_m = std::chrono::duration_cast<std::chrono::nanoseconds>(finish_time - start_time).count() * 1e-9;*/
 
 	return convergenceCurve_m;
 }
@@ -235,8 +234,8 @@ std::ostream& operator << (std::ostream& os, const AOA *aoa) {
 	bests_fit.close();
 
 
-	os 	<< "  AOA score (Fitness) = " << aoa->best_score << std::endl
-		<< "  Time = " << aoa->executionTime_m << " seconds";
+	/*os 	<< "  AOA score (Fitness) = " << aoa->best_score << std::endl
+		<< "  Time = " << aoa->executionTime_m << " seconds";*/
 
 	// Salvar valores de convergencia
 	std::fstream conv;

@@ -92,7 +92,7 @@ std::vector<std::vector<int>> Utils::FindVizinhos(int images_size) {
 	std::vector<std::vector<int>>indices_vizinhos;
 	indices_vizinhos.resize(images_size);
 
-	for (int a = initial; a < images_size; a++)
+	/*for (int a = initial; a < images_size; a++)
 	{
 
 		indices_vizinhos[a].push_back(a + 15 >= images_size ? initial : a + 15);
@@ -198,7 +198,76 @@ std::vector<std::vector<int>> Utils::FindVizinhos(int images_size) {
 		indices_vizinhos[a].push_back(a + 15 >= images_size ? initial : a + 15);
 		a = a + 14;
 
+	}*/
+
+	for (int a = initial; a < images_size; a++)
+	{
+
+		indices_vizinhos[a].push_back(a + 9 >= images_size ? initial : a + 9);
+		indices_vizinhos[a].push_back(a + 1);
+		a = a + 9;
+		if (a >= images_size) break;
+		indices_vizinhos[a].push_back(a + 1 >= images_size ? initial : a + 1);
+		indices_vizinhos[a].push_back(a - 1);
+		/*a = a + 1;*/
+
 	}
+	initial = 1;
+	for (int a = initial; a < images_size; a++)
+	{
+
+		indices_vizinhos[a].push_back(a + 7 >= images_size ? initial : a + 7);
+		indices_vizinhos[a].push_back(a + 1);
+		a = a + 7;
+		if (a >= images_size) break;
+		indices_vizinhos[a].push_back(a + 3 >= images_size ? initial : a + 3);
+		indices_vizinhos[a].push_back(a - 1);
+		a = a + 2;
+
+	}
+	initial = 2;
+	for (int a = initial; a < images_size; a++)
+	{
+
+		indices_vizinhos[a].push_back(a + 5 >= images_size ? initial : a + 5);
+		indices_vizinhos[a].push_back(a + 1);
+		a = a + 5;
+		if (a >= images_size) break;
+		indices_vizinhos[a].push_back(a + 5 >= images_size ? initial : a + 5);
+		indices_vizinhos[a].push_back(a - 1);
+		a = a + 4;
+
+	}
+
+	initial = 3;
+	for (int a = initial; a < images_size; a++)
+	{
+
+		indices_vizinhos[a].push_back(a + 3 >= images_size ? initial : a + 3);
+		indices_vizinhos[a].push_back(a + 1);
+		a = a + 3;
+		if (a >= images_size) break;
+		indices_vizinhos[a].push_back(a + 7 >= images_size ? initial : a + 7);
+		indices_vizinhos[a].push_back(a - 1);
+		a = a + 6;
+
+	}
+	initial = 4;
+	for (int a = initial; a < images_size; a++)
+	{
+
+		indices_vizinhos[a].push_back(a + 1 >= images_size ? initial : a + 1);
+		a = a + 1;
+		if (a >= images_size) break;
+		indices_vizinhos[a].push_back(a + 9 >= images_size ? initial : a + 9);
+		a = a + 8;
+
+	}
+
+
+
+
+
 
 	return indices_vizinhos;
 }
@@ -329,10 +398,9 @@ bool lexico_compare(const cv::Point2f& p1, const cv::Point2f& p2) {
 	if (p1.x > p2.x) { return false; }
 	return (p1.y < p2.y);
 }
-
 // Encontrar as correspondencias entre as imagens e suas vizinhas 
 std::vector<std::vector<std::vector<cv::KeyPoint>>> Utils::sift_matches_matrix_encontrar_melhor(std::vector<std::vector<  std::vector<cv::DMatch> >> matriz_matches, std::vector<cv::Mat>  descp_src, std::vector< std::vector<cv::KeyPoint> >  kpts_src, std::vector<std::string> imagens_src, std::vector<std::vector<int>> &indices) {
-	// Matcher de FLANN
+	 //Matcher de FLANN
 	srand(time(NULL));
 	cv::Ptr<cv::DescriptorMatcher> matcher;
 	matcher = cv::DescriptorMatcher::create(cv::DescriptorMatcher::FLANNBASED);
@@ -513,8 +581,7 @@ std::vector<std::vector<std::vector<cv::KeyPoint>>> Utils::sift_matches_matrix_e
 
 			std::vector<int> v(best_kptgt_org.size()); // vector with 100 ints.
 			std::iota(std::begin(v), std::end(v), 0); // Fill with 0, 1, ..., 99.
-			//std::random_shuffle(v.begin(), v.end());
-			int t = best_kpsrc_org.size();
+			
 			
 			//std::sort(XY.begin(), XY.end(), lexico_compare);
 			if (frame1 ==0) 
@@ -548,12 +615,14 @@ std::vector<std::vector<std::vector<cv::KeyPoint>>> Utils::sift_matches_matrix_e
 				
 			}
 			
-			
+			std::random_shuffle(v.begin(), v.end());
+			int t = v.size();
 			
 			t = (t < 50)?t : 50;
 			
 			
-			for (int i = v.size()-10; i < v.size(); i++) {
+			//for (int i = v.size()-50; i < v.size(); i++) {
+			for (int i = 0; i < t; i++) {
 				best_kpsrc.push_back(best_kpsrc_org[v[i]]);
 				best_kptgt.push_back(best_kptgt_org[v[i]]);
 				

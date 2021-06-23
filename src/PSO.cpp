@@ -102,7 +102,7 @@ double* PSO::Evaluate(bool debug, std::vector<std::vector<std::vector<cv::KeyPoi
 	double w;
 	cv::Mat image1 = cv::imread(imagens_src[0]);
 
-	auto start_time = std::chrono::high_resolution_clock::now();
+	//auto start_time = std::chrono::high_resolution_clock::now();
 	//#pragma omp parallel for
 	for (register int iteration = 0; iteration < maximumIterations_m; iteration++) {
 
@@ -156,8 +156,8 @@ std::ostream& operator << (std::ostream& os, const PSO *pso) {
 	}
 	bests_sol << "\n";
 	bests_sol.close();
-	os << "  pso score (Fitness) = " << pso->Best_score << std::endl
-		<< "  Time = " << pso->executionTime_m << " seconds";
+	/*os << "  pso score (Fitness) = " << pso->Best_score << std::endl
+		<< "  Time = " << pso->executionTime_m << " seconds";*/
 
 	//melhores fitness em cada simulação
 	std::fstream bests_fit;

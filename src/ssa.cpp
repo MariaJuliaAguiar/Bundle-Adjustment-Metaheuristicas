@@ -72,7 +72,7 @@ void SSA::calculateFitness(std::vector<std::vector<std::vector<cv::KeyPoint>>> b
 				double c2 = Utils::GenerateRandomNumber();
 				double c3 = Utils::GenerateRandomNumber();
 
-				if (c3 < 0.5)
+				if (c3 <= 0.5)
 				{
 					positions_m[agentIndex][variable] = W * best_pos[variable] + c1 * ((boundaries_m[variable].upperBound - boundaries_m[variable].lowerBound)*c2 + boundaries_m[variable].lowerBound);
 				}
@@ -81,13 +81,13 @@ void SSA::calculateFitness(std::vector<std::vector<std::vector<cv::KeyPoint>>> b
 				}
 			}
 		}
-		else if (agentIndex > searchAgentsCount_m / 2 && agentIndex < searchAgentsCount_m + 1)
+		else if (agentIndex > searchAgentsCount_m / 2 && agentIndex < searchAgentsCount_m )
 		{
 			double *X_0 = positions_m[agentIndex - 1];
 			double *X_1 = positions_m[agentIndex];
 			for (register unsigned int variable = 0; variable < dimension_m; variable++)
 			{
-				positions_m[agentIndex][variable] = (W * X_0[variable] + W * X_1[variable]) / 2;
+				positions_m[agentIndex][variable] = (W * X_0[variable] + X_1[variable]) / 2;
 			}
 
 		}
@@ -97,7 +97,7 @@ void SSA::calculateFitness(std::vector<std::vector<std::vector<cv::KeyPoint>>> b
 //#pragma omp parallel for //morceguinhos
 	for (register int agentIndex = 0; agentIndex < searchAgentsCount_m; agentIndex++)
 	{
-		int *IndUB = new int[dimension_m];
+	/*	int *IndUB = new int[dimension_m];
 		int *IndLB = new int[dimension_m];
 
 		for (register unsigned int variable = 0; variable < dimension_m; variable++)
@@ -131,16 +131,17 @@ void SSA::calculateFitness(std::vector<std::vector<std::vector<cv::KeyPoint>>> b
 				non_sum = 1;
 				sum = 0;
 
-			}
-			positions_m[agentIndex][variable] = positions_m[agentIndex][variable] * (non_sum)+boundaries_m[variable].upperBound*(IndUB[variable]) + boundaries_m[variable].lowerBound*IndLB[variable];
-		}
+			}*/
+		Utils::Clip1DArray(positions_m[agentIndex], dimension_m, boundaries_m);
+			//positions_m[agentIndex][variable] = positions_m[agentIndex][variable] * (non_sum)+boundaries_m[variable].upperBound*(IndUB[variable]) + boundaries_m[variable].lowerBound*IndLB[variable];
+		/*}*/
 		fitness = benchmark_m->fitness(positions_m[agentIndex], bestKey, imagens_src, im360, rows, cols, indices);
-		if (fitness <= best_score)
+		if (fitness < best_score)
 		{
 			best_score = fitness;
 			//best_pos = positions_m[agentIndex];
 			std::copy(&positions_m[agentIndex][0], &positions_m[agentIndex][dimension_m], &best_pos[0]);
-
+			std::cout << "passei aqui";
 		}
 
 	}
@@ -153,28 +154,37 @@ double* SSA::Evaluate(bool debug, std::vector<std::vector<std::vector<cv::KeyPoi
 	cv::Mat image1 = cv::imread(imagens_src[0]);
 	// A avalia a população inicial
 	fitness_inicial(bestKey, imagens_src, im360, image1.rows, image1.cols, indices);
-	
-	
-	
-	double *x_score_ordenado;
-
-	std::vector<int>Ind_Salp_Ordenado;
-	Ind_Salp_Ordenado.resize(searchAgentsCount_m);
-	x_score_ordenado = x_score;
-	Utils::sortArr(x_score_ordenado, searchAgentsCount_m, Ind_Salp_Ordenado);// ordenar em ordem crescente
-
-	double **positions_Salp_Ordenado = new double*[searchAgentsCount_m];
-	for (int y = 0; y < searchAgentsCount_m; y++)
+	for (int a = 0; a < searchAgentsCount_m; a++)
 	{
-		positions_Salp_Ordenado[y] = new double[dimension_m];
-		positions_Salp_Ordenado[y] = positions_m[Ind_Salp_Ordenado[y]];
+		if (x_score[a] < best_score)
+		{
+			best_score = x_score[a];
+			std::copy(&positions_m[a][0], &positions_m[a][dimension_m], &best_pos[0]);
+
+		}
 
 	}
-	best_score = x_score_ordenado[0];
-	convergenceCurve_m[0] = best_score;
-	std::copy(&positions_Salp_Ordenado[0][0], &positions_Salp_Ordenado[0][dimension_m], &best_pos[0]);
+	
+	//
+	//double *x_score_ordenado;
 
-	auto start_time = std::chrono::high_resolution_clock::now();
+	//std::vector<int>Ind_Salp_Ordenado;
+	//Ind_Salp_Ordenado.resize(searchAgentsCount_m);
+	//x_score_ordenado = x_score;
+	//Utils::sortArr(x_score_ordenado, searchAgentsCount_m, Ind_Salp_Ordenado);// ordenar em ordem crescente
+
+	//double **positions_Salp_Ordenado = new double*[searchAgentsCount_m];
+	//for (int y = 0; y < searchAgentsCount_m; y++)
+	//{
+	//	positions_Salp_Ordenado[y] = new double[dimension_m];
+	//	positions_Salp_Ordenado[y] = positions_m[Ind_Salp_Ordenado[y]];
+
+	//}
+	//best_score = x_score_ordenado[0];
+	convergenceCurve_m[0] = best_score;
+	//std::copy(&positions_Salp_Ordenado[0][0], &positions_Salp_Ordenado[0][dimension_m], &best_pos[0]);
+
+	//auto start_time = std::chrono::high_resolution_clock::now();
 //#pragma omp parallel for
 	for (register int iteration = 1; iteration < maximumIterations_m; iteration++) {
 
@@ -193,8 +203,8 @@ double* SSA::Evaluate(bool debug, std::vector<std::vector<std::vector<cv::KeyPoi
 
 	}
 
-	auto finish_time = std::chrono::high_resolution_clock::now();
-	executionTime_m = std::chrono::duration_cast<std::chrono::nanoseconds>(finish_time - start_time).count() * 1e-9;
+	/*auto finish_time = std::chrono::high_resolution_clock::now();
+	executionTime_m = std::chrono::duration_cast<std::chrono::nanoseconds>(finish_time - start_time).count() * 1e-9;*/
 
 	return convergenceCurve_m;
 }
@@ -225,8 +235,8 @@ std::ostream& operator << (std::ostream& os, const SSA *ssa) {
 	bests_sol << "\n";
 	bests_sol.close();
 
-	os << "  SSA score(Fitness) = " << ssa->best_score << std::endl
-		<< "  Time = " << ssa->executionTime_m << " seconds";
+	/*os << "  SSA score(Fitness) = " << ssa->best_score << std::endl
+		<< "  Time = " << ssa->executionTime_m << " seconds";*/
 
 	//melhores fitness em cada simulação
 	std::fstream bests_fit;//(pasta + "convergencia.txt");
