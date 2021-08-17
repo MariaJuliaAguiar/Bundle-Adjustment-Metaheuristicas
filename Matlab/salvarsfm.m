@@ -2,11 +2,11 @@ close all; clear all; clc
 
 
 %% Melhores fitness
-bestFit_GWO = load('C:/Users/julia/Pictures/geradorartesspace/scan2\Resultados2/best_fit_GWO.txt');
-bestFit_BAT = load('C:/Users/julia/Pictures/geradorartesspace/scan2\Resultados2/best_fit_BAT.txt');
-bestFit_AOA = load('C:/Users/julia/Pictures/geradorartesspace/scan2\Resultados2/best_fit_AOA.txt');
-bestFit_SSA = load('C:/Users/julia/Pictures/geradorartesspace/scan2\Resultados2/best_fit_SSA.txt');
-bestFit_PSO = load('C:/Users/julia/Pictures/geradorartesspace/scan2\Resultados2/best_fit_PSO.txt');
+bestFit_GWO = load('C:\Users\julia\Pictures\SantosDumont_4\santosdumont_patio\scan32/best_fit_GWO.txt');
+bestFit_BAT = load('C:\Users\julia\Pictures\SantosDumont_4\santosdumont_patio\scan32/best_fit_BAT.txt');
+bestFit_AOA = load('C:\Users\julia\Pictures\SantosDumont_4\santosdumont_patio\scan32/best_fit_AOA.txt');
+bestFit_SSA = load('C:\Users\julia\Pictures\SantosDumont_4\santosdumont_patio\scan32/best_fit_SSA.txt');
+bestFit_PSO = load('C:\Users\julia\Pictures\SantosDumont_4\santosdumont_patio\scan32/best_fit_PSO.txt');
 
 
 [Best_score_GWO,I_GWO] = min(bestFit_GWO);
@@ -16,11 +16,11 @@ bestFit_PSO = load('C:/Users/julia/Pictures/geradorartesspace/scan2\Resultados2/
 [Best_score_SSA,I_PSO] = min(bestFit_PSO);
 %salvar sfm
 
-best_GWO = load('C:/Users/julia/Pictures/geradorartesspace/scan2\Resultados2/bests_sol_GWO.txt');
-best_bats = load('C:/Users/julia/Pictures/geradorartesspace/scan2\Resultados2\bests_sol_BAT.txt');
-best_AOA = load('C:/Users/julia/Pictures/geradorartesspace/scan2\Resultados2\bests_sol_AOA.txt');
-best_SSA = load('C:/Users/julia/Pictures/geradorartesspace/scan2\Resultados2\bests_sol_SSA.txt');
-best_PSO = load('C:/Users/julia/Pictures/geradorartesspace/scan2\Resultados2\bests_sol_PSO.txt');
+best_GWO = load('C:\Users\julia\Pictures\SantosDumont_4\santosdumont_patio\scan32/bests_sol_GWO.txt');
+best_bats = load('C:\Users\julia\Pictures\SantosDumont_4\santosdumont_patio\scan32\bests_sol_BAT.txt');
+best_AOA = load('C:\Users\julia\Pictures\SantosDumont_4\santosdumont_patio\scan32\bests_sol_AOA.txt');
+best_SSA = load('C:\Users\julia\Pictures\SantosDumont_4\santosdumont_patio\scan32\bests_sol_SSA.txt');
+best_PSO = load('C:\Users\julia\Pictures\SantosDumont_4\santosdumont_patio\scan32\bests_sol_PSO.txt');
 
 nomes_imagens = cell(1, length(best_bats)/6);
 
@@ -37,11 +37,11 @@ teste=1;
 variable =1;
 
 % for n=1:size(best_bats)
-nome_GWO = ['C:/Users/julia/Pictures/geradorartesspace/scan2\Resultados2/cameras_GWO',num2str(I_GWO),'.sfm'];
-nome_BAT = ['C:/Users/julia/Pictures/geradorartesspace/scan2\Resultados2/cameras_BAT',num2str(I_BAT),'.sfm'];
-nome_AOA = ['C:/Users/julia/Pictures/geradorartesspace/scan2\Resultados2/cameras_AOA',num2str(I_AOA),'.sfm'];
-nome_SSA = ['C:/Users/julia/Pictures/geradorartesspace/scan2\Resultados2/cameras_SSA',num2str(I_SSA),'.sfm'];
-nome_PSO = ['C:/Users/julia/Pictures/geradorartesspace/scan2\Resultados2/cameras_PSO',num2str(I_PSO),'.sfm'];
+nome_GWO = ['C:\Users\julia\Pictures\SantosDumont_4\santosdumont_patio\scan32/cameras_GWO',num2str(I_GWO),'.sfm'];
+nome_BAT = ['C:\Users\julia\Pictures\SantosDumont_4\santosdumont_patio\scan32/cameras_BAT',num2str(I_BAT),'.sfm'];
+nome_AOA = ['C:\Users\julia\Pictures\SantosDumont_4\santosdumont_patio\scan32/cameras_AOA',num2str(I_AOA),'.sfm'];
+nome_SSA = ['C:\Users\julia\Pictures\SantosDumont_4\santosdumont_patio\scan32/cameras_SSA',num2str(I_SSA),'.sfm'];
+nome_PSO = ['C:\Users\julia\Pictures\SantosDumont_4\santosdumont_patio\scan32/cameras_PSO',num2str(I_PSO),'.sfm'];
 
 
 file_GWO  = fopen(nome_GWO,'w');

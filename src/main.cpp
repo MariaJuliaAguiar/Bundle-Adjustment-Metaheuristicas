@@ -1,6 +1,5 @@
 //includes meus 
-#define NOGDI
-#define GLOG_NO_ABBREVIATED_SEVERITIES
+
 #include "argument.hpp"
 #include "utils.hpp"
 #include "gwo.hpp"
@@ -12,10 +11,9 @@
 
 #include <windows.h>
 #include "opencv2/opencv.hpp"
-#include "ceres/ceres.h"
-#include "ceres/rotation.h"
+
 #include "GWOException.hpp"
-#include "bundle_adjutment.hpp"
+
 /// Definicoes e namespaces
 
 using namespace cv;
@@ -65,16 +63,16 @@ void freeMemoryOti() {
 }
 int main() {
 	//Localização do arquivo NVM/SFM com posição das imagens de acordo com o PEPO
-	std::string pasta = "C:/Users/julia/Desktop/dissertação - correções/imagens/Caso4/";
+	std::string pasta = "C:/Users/julia/Pictures/quintal35/scan1-20210225T171058Z-001/scan1/";
 
 	//Encontrando posição originais das imagens (Posição do PEPO)
 	double fx, fy, cx, cy;
 	std::vector<std::string> imagens_src;
-	std::vector<std::vector<float> > pose = Utils::lerSFM(pasta, fx, fy, cx, cy, imagens_src);
+	std::vector<std::vector<float> > pose = Utils::lerSFM(pasta, fx, fy, cx, cy, imagens_src);//roll, pitch, yaw, fx, fy, cx e cy
 
-	//Enocntrandos os limites maximos e minimos dos parâmetros 
+	//Encontrandos os limites maximos e minimos dos parâmetros 
 	std::vector<double> lb, up;
-	Utils::uplowerBound(pose, fx, fy, cx, cy, lb, up);
+	Utils::uplowerBound(pose, fx, fy, cx, cy, lb, up);//definir lower and upper bounds
 
 	vector<int>  ind_val;
 
@@ -83,20 +81,12 @@ int main() {
 	//Encontrando imagens vizinhas de acordo com a ordem que foram tiradas 
 
 	std::vector<vector<int>>indices_vizinhos = Utils::FindVizinhos(imagens_src.size());
-	/*
-	std::vector<std::vector<int>>indices_vizinhos;
-	indices_vizinhos.resize(1);
-	indices_vizinhos[0].push_back(1);*/
-	//indices_vizinhos[0].push_back(2);
-
+	
 	// Features Matching - Keypoints e descriptors
 	vector<vector<cv::KeyPoint>>  kpts_src;
 	vector<cv::Mat>  descp_src;
 	descp_src.resize(imagens_src.size());
 	kpts_src.resize(imagens_src.size());
-
-
-
 
 
 	std::cout << "Calculando features e matches" << std::endl;
@@ -110,25 +100,25 @@ int main() {
 	vector<vector<  vector<cv::DMatch> >> matriz_matches(indices_vizinhos.size());
 	for (int i = 0; i < matriz_matches.size(); i++)
 		matriz_matches.at(i).resize(indices_vizinhos[i].size());
-	//std::vector<std::vector<std::vector<cv::KeyPoint>>> bestKey;
 
 	std::vector<std::vector<std::vector<cv::KeyPoint>>> bestKey = Utils::sift_matches_matrix_encontrar_melhor(matriz_matches, descp_src, kpts_src, imagens_src, indices_vizinhos);
-	float step_deg = 0.1; // [DEGREES]
+	float step_deg = 0.1; // [DEGREES]//resolução
 	int raios_360 = int(360.0 / step_deg), raios_180 = raios_360 / 2.0; // Quantos raios sairao do centro para formar 360 e 180 graus de um circulo 2D
 
 	//Size of final panoramic
 	cv::Mat im360 = cv::Mat::zeros(cv::Size(raios_360, raios_180), CV_8UC3); // Imagem 360 ao final de todas as fotos passadas sem blending 
 
 	Utils::clearResultstxt(pasta);//limpar arquivos de simulações anteriores dessa pasta;
-	std::cout << "Inicializando simulações" << std::endl;
+	std::cout << "Inicializando simulacoes" << std::endl;
 
-
+	//************************************************
+	//Parâmetros de simulação
 	int searchAgentsCount_m = 35;// numero de agentes
-	int dimension_m = indices_vizinhos.size() * 6;// imagens_src.size() * 6; //  dimensão 
-	int iterations = 2000; // número de iterações
-	int simulations = 10;//quantidade de simulações
+	int dimension_m = indices_vizinhos.size() * 6;// dimensão 
+	int iterations = 1000; // número de iterações
+	int simulations = 1;//quantidade de simulações
 	
-		
+	//Melhores soluções	
 	double **Best_pos_PSO = new double *[simulations];
 	double *Best_sol_PSO = new double[simulations];
 	double **Best_pos_SSA = new double *[simulations];
@@ -140,9 +130,11 @@ int main() {
 	double **Best_pos_GWO = new double *[simulations];
 	double *Best_sol_GWO = new double[simulations];
 
+	//tempos de cada meaheurística
 	std::vector<double> time_gwo, time_bat, time_aoa, time_ssa, time_pso;
 	time_gwo.resize(simulations);	time_bat.resize(simulations);	time_aoa.resize(simulations);	time_ssa.resize(simulations);	time_pso.resize(simulations);
-	///#pragma omp parallel for
+	
+	
 	for (int a = 0; a < simulations; a++)
 	{
 
@@ -168,12 +160,12 @@ int main() {
 		gwo = new GWO(argument->GetBenchmark(), searchAgentsCount_m, iterations, ind_val, positions_inicial, pasta);
 
 		(void)gwo->Evaluate(true, bestKey, imagens_src, im360, indices_vizinhos);
-		std::cout << " Result " << a << std::endl
+		std::cout /*<< " Result " << a << std::endl*/
 			<< gwo << std::endl << std::endl;
 		std::cout << "";
 
-		Best_pos_GWO[a] = gwo->GetAlphaPosition();
-		Best_sol_GWO[a] = gwo->GetAlphaScore();
+		Best_pos_GWO[a] = gwo->GetAlphaPosition();//melhor posição
+		Best_sol_GWO[a] = gwo->GetAlphaScore();//melor sitness
 
 
 		auto finish_time_gwo = std::chrono::high_resolution_clock::now();
@@ -205,7 +197,7 @@ int main() {
 		bat = new BAT(argument->GetBenchmark(), searchAgentsCount_m, iterations, ind_val, amp_sonora, taxa, lambda, alpha, gama, fmax, fmin, A0, rf, positions_inicial, pasta);
 		(void)bat->Evaluate(true, bestKey, imagens_src, im360, indices_vizinhos);
 		bat;
-		std::cout << " Result " << a << std::endl
+		std::cout /*<< " Result " << a << std::endl*/
 			<< bat << std::endl << std::endl;
 		std::cout << "";
 
@@ -288,6 +280,7 @@ int main() {
 		Best_sol_PSO[a] = pso->GetBestScorePSO();
 		auto finish_time_pso = std::chrono::high_resolution_clock::now();
 		time_pso[a] = std::chrono::duration_cast<std::chrono::nanoseconds>(finish_time_pso - start_time_pso).count() * 1e-9;
+		
 		for (register unsigned int agentId = 0; agentId < searchAgentsCount_m; agentId++) {
 			delete positions_inicial[agentId];
 		}
@@ -295,7 +288,7 @@ int main() {
 	}
 
 	freeMemory();
-
+	//salvar os tempos em arquivo txt
 	std::ofstream ofs;
 	ofs.open(pasta + "Tempo_GWO.txt", std::ofstream::out | std::ofstream::trunc);
 
@@ -333,38 +326,45 @@ int main() {
 
 
 
-	//std::cout << "Gerando imagens panoramicas" << endl;
+	//std::cout << "Gerando imagens panoramicas" << endl; - Com e Sem Blending
 	//////Encontrar melhor solução de todas as simulações 
 	std::cout << "GWO - ";
 	auto it_gwo = std::min_element(Best_sol_GWO, Best_sol_GWO + simulations);
 	int index_GWO = std::distance(Best_sol_GWO, it_gwo);
-	cv::Mat im360_GWO = Utils::panoramicas(dimension_m, pasta, Best_pos_GWO[index_GWO]);
-	cv::imwrite(pasta + "im360_GWO.png", im360_GWO);
+	std::vector<cv::Mat> im360_GWO = Utils::panoramicas(dimension_m, pasta, Best_pos_GWO[index_GWO]);
+	cv::imwrite(pasta + "im360_GWO.png", im360_GWO[0]);
+	cv::imwrite(pasta + "im360_GWO_blending.png", im360_GWO[1]);
 
 	std::cout << "BAT - ";
 	auto it_BAT = std::min_element(Best_sol_BAT, Best_sol_BAT + simulations);
 	int index_BAT = std::distance(Best_sol_BAT, it_BAT);
-	cv::Mat im360_BAT = Utils::panoramicas(dimension_m, pasta, Best_pos_BAT[index_BAT]);
-	cv::imwrite(pasta + "im360_BAT.png", im360_BAT);
+	std::vector<cv::Mat> im360_BAT = Utils::panoramicas(dimension_m, pasta, Best_pos_BAT[index_BAT]);
+	cv::imwrite(pasta + "im360_BAT.png", im360_BAT[0]);
+	cv::imwrite(pasta + "im360_BAT_blending.png", im360_BAT[1]);
 
 	std::cout << "AOA - ";
 	auto it_AOA = std::min_element(Best_sol_AOA, Best_sol_AOA + simulations);
 	int index_AOA = std::distance(Best_sol_AOA, it_AOA);
-	cv::Mat im360_AOA = Utils::panoramicas(dimension_m, pasta, Best_pos_AOA[index_AOA]);
-	cv::imwrite(pasta + "im360_AOA.png", im360_AOA);
+	std::vector<cv::Mat> im360_AOA = Utils::panoramicas(dimension_m, pasta, Best_pos_AOA[index_AOA]);
+	cv::imwrite(pasta + "im360_AOA.png", im360_AOA[0]);
+	cv::imwrite(pasta + "im360_AOA_blending.png", im360_AOA[1]);
 
 	std::cout << "SSA - ";
 	auto it_SSA = std::min_element(Best_sol_SSA, Best_sol_SSA + simulations);
 	int index_SSA = std::distance(Best_sol_SSA, it_SSA);
-	cv::Mat im360_SSA = Utils::panoramicas(dimension_m, pasta, Best_pos_SSA[index_SSA]);
-	cv::imwrite(pasta + "im360_SSA.png", im360_SSA);
+	std::vector<cv::Mat> im360_SSA = Utils::panoramicas(dimension_m, pasta, Best_pos_SSA[index_SSA]);
+	cv::imwrite(pasta + "im360_SSA.png", im360_SSA[0]);
+	cv::imwrite(pasta + "im360_SSA_blending.png", im360_SSA[1]);
+
 	freeMemoryOti();
 
 	std::cout << "PSO - ";
 	auto it_PSO = std::min_element(Best_sol_PSO, Best_sol_PSO + simulations);
 	int index_PSO = std::distance(Best_sol_PSO, it_PSO);
-	cv::Mat im360_PSO = Utils::panoramicas(dimension_m, pasta, Best_pos_PSO[index_PSO]);
-	cv::imwrite(pasta + "im360_PSO.png", im360_PSO);
+	std::vector<cv::Mat> im360_PSO = Utils::panoramicas(dimension_m, pasta, Best_pos_PSO[index_PSO]);
+	cv::imwrite(pasta + "im360_PSO.png", im360_PSO[0]);
+	cv::imwrite(pasta + "im360_PSO_blending.png", im360_PSO[1]);
+
 	freeMemoryOti();
 
 	std::cout << " Processo Finalizado";

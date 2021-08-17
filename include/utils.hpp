@@ -29,8 +29,11 @@ public:
 	static void Clip1DArray(double array[], unsigned int columnCount, Boundaries boundaries[]);
 	static void sortArr(double array[], int n, std::vector<int> &Ind_Salp_Ordenado);
 	static void clearResultstxt(std::string pasta);
-	static cv::Mat panoramicas(int dimension, std::string pasta, double* best_Gwo);
+	static std::vector<cv::Mat> panoramicas(int dimension, std::string pasta, double* best_Gwo);
+	static cv::Mat createMask(cv::Mat img, std::vector<std::vector<cv::Point>> contours, int k, int qnt_images_linha, int ind);
+	static cv::Mat multiband_blending(cv::Mat a, const cv::Mat b, int k, int qnt_images_linha, int ind);
 	static void doTheThing(float sd, Eigen::Vector3d p2, Eigen::Vector3d p4, Eigen::Vector3d p5, Eigen::Vector3d pc, cv::Mat im, cv::Mat &img, cv::Mat im360);
+	static void dotsFilter(cv::Mat& in);
 };
 
 #endif

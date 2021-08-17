@@ -141,7 +141,7 @@ void SSA::calculateFitness(std::vector<std::vector<std::vector<cv::KeyPoint>>> b
 			best_score = fitness;
 			//best_pos = positions_m[agentIndex];
 			std::copy(&positions_m[agentIndex][0], &positions_m[agentIndex][dimension_m], &best_pos[0]);
-			std::cout << "passei aqui";
+			
 		}
 
 	}
