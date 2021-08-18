@@ -1,11 +1,11 @@
 #include "utils.hpp"
 
 
-Utils *utils = nullptr;
+Utils* utils = nullptr;
 
 
 // Função para encontrar a posição vinda do robo que sera necessaria para encontrar o chute inicial e os limites dos parametros
-std::vector<std::vector<float>>  Utils::lerSFM(std::string pasta, double &fx, double &fy, double &cx, double &cy, std::vector<std::string> &imagens_src) {
+std::vector<std::vector<float>>  Utils::lerSFM(std::string pasta, double& fx, double& fy, double& cx, double& cy, std::vector<std::string>& imagens_src) {
 
 	std::string arquivo_sfm = pasta + "cameras.sfm";
 
@@ -33,6 +33,7 @@ std::vector<std::vector<float>>  Utils::lerSFM(std::string pasta, double &fx, do
 	//std::fstream conv;
 	std::ofstream conv;
 	conv.open(pasta + "original.sfm", std::ofstream::out | std::ofstream::trunc);
+	conv << linhas.size() << "\n";
 	//conv.open(pasta+"original.sfm");
 	for (int i = 0; i < linhas.size(); i++) {
 		std::istringstream iss(linhas[i]);
@@ -55,7 +56,7 @@ std::vector<std::vector<float>>  Utils::lerSFM(std::string pasta, double &fx, do
 		fy = stod(splits[14]);
 		cx = stod(splits[15]);
 		cy = stod(splits[16]);
-		
+
 		conv << pasta + nome_fim << " " << ea[1] << " " << ea[2] << " " << fx << " " << fy << " " << cx << " " << cy << "\n";
 	}
 	conv.close();
@@ -64,50 +65,50 @@ std::vector<std::vector<float>>  Utils::lerSFM(std::string pasta, double &fx, do
 }
 
 // Função para encontrar os limites maximos e minimos dos parâmetros
-void Utils::uplowerBound(std::vector<std::vector<float> > pose, double fx, double fy, double cx, double cy, std::vector<double> &lb, std::vector<double> &up)
+void Utils::uplowerBound(std::vector<std::vector<float> > pose, double fx, double fy, double cx, double cy, std::vector<double>& lb, std::vector<double>& up)
 {
-	
+
 
 	for (int j = 0; j < pose.size(); j++)
 	{
 
-	//	if (pose[j][1]>0) {
-	//		lb.push_back(pose[j][1]*0.98);//tilt
-	//		up.push_back(pose[j][1]*1.02);//tilt
-	//	}
-	//	else {
-	//		lb.push_back(pose[j][1] * 1.02);//tilt
-	//		up.push_back( pose[j][1] * 0.98);//tilt
-	//	}
+		//	if (pose[j][1]>0) {
+		//		lb.push_back(pose[j][1]*0.98);//tilt
+		//		up.push_back(pose[j][1]*1.02);//tilt
+		//	}
+		//	else {
+		//		lb.push_back(pose[j][1] * 1.02);//tilt
+		//		up.push_back( pose[j][1] * 0.98);//tilt
+		//	}
 
 
-	//	if (pose[j][2] > 0) {
-	//		lb.push_back(pose[j][2] * 0.98);//tilt
-	//		up.push_back(pose[j][2] * 1.02);//tilt
-	//	}
-	//	else {
-	//		lb.push_back(pose[j][2] * 1.02);//tilt
-	//		up.push_back(pose[j][2] * 0.98);//tilt
-	//	}
+		//	if (pose[j][2] > 0) {
+		//		lb.push_back(pose[j][2] * 0.98);//tilt
+		//		up.push_back(pose[j][2] * 1.02);//tilt
+		//	}
+		//	else {
+		//		lb.push_back(pose[j][2] * 1.02);//tilt
+		//		up.push_back(pose[j][2] * 0.98);//tilt
+		//	}
 
 
 
 
-		//Lower bounds
+			//Lower bounds
 		lb.push_back(pose[j][1] - 3);//tilt
 		lb.push_back(pose[j][2] - 3);//pan
-		lb.push_back(fx -3);//foco x
-		lb.push_back(fy -3);////foco y
-		lb.push_back(cx-3);//centro x
-		lb.push_back(cy -3);//centro y
+		lb.push_back(fx - 3);//foco x
+		lb.push_back(fy - 3);////foco y
+		lb.push_back(cx - 3);//centro x
+		lb.push_back(cy - 3);//centro y
 
 		//Upper Bounds
 		up.push_back(pose[j][1] + 3);//tilt
 		up.push_back(pose[j][2] + 3);//pan
-		up.push_back(fx  +3);//foco x
-		up.push_back(fy  +3);//foco y
-		up.push_back(cx  +3);//centro x
-		up.push_back(cy  +3);//centro y
+		up.push_back(fx + 3);//foco x
+		up.push_back(fy + 3);//foco y
+		up.push_back(cx + 3);//centro x
+		up.push_back(cy + 3);//centro y
 	}
 
 }
@@ -297,7 +298,7 @@ std::vector<std::vector<int>> Utils::FindVizinhos(int images_size) {
 	return indices_vizinhos;
 }
 // Encontrar as features de todas as imagens - ROOTSFIT para melhor desempenho
-void Utils::calcular_features_sift(std::vector<cv::Mat>  &descp_src, std::vector<std::vector<cv::KeyPoint> >  &kpts_src, std::vector<std::string> imagens_src)
+void Utils::calcular_features_sift(std::vector<cv::Mat>& descp_src, std::vector<std::vector<cv::KeyPoint> >& kpts_src, std::vector<std::string> imagens_src)
 {
 
 #pragma omp parallel for
@@ -334,7 +335,7 @@ void Utils::calcular_features_sift(std::vector<cv::Mat>  &descp_src, std::vector
 
 	}
 }
-void Utils::filtrar_matches_keypoints_repetidos(std::vector<cv::KeyPoint> &kt, std::vector<cv::KeyPoint> &ks, std::vector<cv::DMatch> &m) {
+void Utils::filtrar_matches_keypoints_repetidos(std::vector<cv::KeyPoint>& kt, std::vector<cv::KeyPoint>& ks, std::vector<cv::DMatch>& m) {
 	// Matriz de bins para keypoints de target e source
 
 	const int w = 1280 / 5, h = 720 / 5;
@@ -419,15 +420,15 @@ bool lexico_compare(const cv::Point2f& p1, const cv::Point2f& p2) {
 	return (p1.y < p2.y);
 }
 // Encontrar as correspondencias entre as imagens e suas vizinhas 
-std::vector<std::vector<std::vector<cv::KeyPoint>>> Utils::sift_matches_matrix_encontrar_melhor(std::vector<std::vector<  std::vector<cv::DMatch> >> matriz_matches, std::vector<cv::Mat>  descp_src, std::vector< std::vector<cv::KeyPoint> >  kpts_src, std::vector<std::string> imagens_src, std::vector<std::vector<int>> &indices) {
-	 //Matcher de FLANN
+std::vector<std::vector<std::vector<cv::KeyPoint>>> Utils::sift_matches_matrix_encontrar_melhor(std::vector<std::vector<  std::vector<cv::DMatch> >> matriz_matches, std::vector<cv::Mat>  descp_src, std::vector< std::vector<cv::KeyPoint> >  kpts_src, std::vector<std::string> imagens_src, std::vector<std::vector<int>>& indices) {
+	//Matcher de FLANN
 	srand(time(NULL));
 	cv::Ptr<cv::DescriptorMatcher> matcher;
 	matcher = cv::DescriptorMatcher::create(cv::DescriptorMatcher::FLANNBASED);
 
 	std::vector<std::vector<int>> filter_zero;
 	filter_zero.resize(imagens_src.size());
-	
+
 	for (int frame0 = 0; frame0 < imagens_src.size(); frame0++) {
 
 		for (int frame1 = 0; frame1 < indices[frame0].size(); frame1++)
@@ -441,7 +442,7 @@ std::vector<std::vector<std::vector<cv::KeyPoint>>> Utils::sift_matches_matrix_e
 				{
 					if (matches.at(k).size() >= 2)
 					{
-						if (matches.at(k).at(0).distance < 0.7*matches.at(k).at(1).distance) // Se e bastante unica frente a segunda colocada
+						if (matches.at(k).at(0).distance < 0.7 * matches.at(k).at(1).distance) // Se e bastante unica frente a segunda colocada
 							good_matches.push_back(matches.at(k).at(0));
 					}
 				}
@@ -497,7 +498,7 @@ std::vector<std::vector<std::vector<cv::KeyPoint>>> Utils::sift_matches_matrix_e
 				std::vector<int> indices_inliers;
 				for (int i = 0; i < kpsrc.size(); i++) {
 					Eigen::Vector3d pt{ kptgt[i].x, kptgt[i].y, 1 }, ps = { kpsrc[i].x, kpsrc[i].y, 1 };
-					Eigen::MatrixXd erro = pt.transpose()*F_*ps;
+					Eigen::MatrixXd erro = pt.transpose() * F_ * ps;
 					if (abs(erro(0, 0)) < 0.2) {
 						tempt.push_back(kptgt[i]); temps.push_back(kpsrc[i]);
 						indices_inliers.push_back(i);
@@ -597,59 +598,59 @@ std::vector<std::vector<std::vector<cv::KeyPoint>>> Utils::sift_matches_matrix_e
 			best_kptgt.clear();
 			best_kpsrc.clear();
 
-			std::vector<int> v(best_kptgt_org.size()); 
-			std::iota(std::begin(v), std::end(v), 0); 
-			
-			
+			std::vector<int> v(best_kptgt_org.size());
+			std::iota(std::begin(v), std::end(v), 0);
+
+
 			//std::sort(XY.begin(), XY.end(), lexico_compare);
-			if (frame1 ==0) 
+			if (frame1 == 0)
 			{
 				std::sort(std::begin(v), std::end(v),
 					[&](int i1, int i2) {
-					if (best_kpsrc_org[i1].pt.x < best_kpsrc_org[i2].pt.x) { return true; }
-					if (best_kpsrc_org[i1].pt.x > best_kpsrc_org[i2].pt.x) { return false; }
-					return (best_kpsrc_org[i1].pt.y < best_kpsrc_org[i2].pt.y);
-				});
+						if (best_kpsrc_org[i1].pt.x < best_kpsrc_org[i2].pt.x) { return true; }
+						if (best_kpsrc_org[i1].pt.x > best_kpsrc_org[i2].pt.x) { return false; }
+						return (best_kpsrc_org[i1].pt.y < best_kpsrc_org[i2].pt.y);
+					});
 
 				v.erase(std::unique(std::begin(v), std::end(v),
 					[&](int i1, int i2) {
-					return ((best_kpsrc_org[i1].pt.x == best_kpsrc_org[i2].pt.x) && (best_kpsrc_org[i1].pt.y == best_kpsrc_org[i2].pt.y));
-				}), std::end(v));
+						return ((best_kpsrc_org[i1].pt.x == best_kpsrc_org[i2].pt.x) && (best_kpsrc_org[i1].pt.y == best_kpsrc_org[i2].pt.y));
+					}), std::end(v));
 			}
 			else {
 				std::sort(std::begin(v), std::end(v),
 					[&](int i1, int i2) {
-					/*if (best_kpsrc_org[i1].pt.x < best_kpsrc_org[i2].pt.x) { return true; }
-					if (best_kpsrc_org[i1].pt.x > best_kpsrc_org[i2].pt.x) { return false; }*/
-					return (best_kpsrc_org[i1].pt.y < best_kpsrc_org[i2].pt.y);
-				});
+						/*if (best_kpsrc_org[i1].pt.x < best_kpsrc_org[i2].pt.x) { return true; }
+						if (best_kpsrc_org[i1].pt.x > best_kpsrc_org[i2].pt.x) { return false; }*/
+						return (best_kpsrc_org[i1].pt.y < best_kpsrc_org[i2].pt.y);
+					});
 
 				v.erase(std::unique(std::begin(v), std::end(v),
 					[&](int i1, int i2) {
-					return ((best_kpsrc_org[i1].pt.x == best_kpsrc_org[i2].pt.x) && (best_kpsrc_org[i1].pt.y == best_kpsrc_org[i2].pt.y));
-				}), std::end(v));
+						return ((best_kpsrc_org[i1].pt.x == best_kpsrc_org[i2].pt.x) && (best_kpsrc_org[i1].pt.y == best_kpsrc_org[i2].pt.y));
+					}), std::end(v));
 
 
-				
+
 			}
-			
+
 			//std::random_shuffle(v.begin(), v.end());
 			int t = v.size();
-			
-			t = (t < 50)?t : 50;
-			
+
+			t = (t < 50) ? t : 50;
+
 			//selecionando as features das bordas - 50 features
-			for (int i = v.size()-50; i < v.size(); i++) {
-			//for (int i = 0; i < t; i++) {
+			for (int i = v.size() - 50; i < v.size(); i++) {
+				//for (int i = 0; i < t; i++) {
 				best_kpsrc.push_back(best_kpsrc_org[v[i]]);
 				best_kptgt.push_back(best_kptgt_org[v[i]]);
-				
+
 			}
 			if (t > 0) {
 				filter_zero[frame0].push_back(indices[frame0][frame1]);
 				bestKey[frame0].push_back(best_kpsrc);
 				bestKey[frame0].push_back(best_kptgt);
-				
+
 			}
 			if (debug) {
 				cv::Mat im1 = cv::imread(imagens_src[indices[frame0][frame1]], cv::IMREAD_COLOR);
@@ -662,8 +663,8 @@ std::vector<std::vector<std::vector<cv::KeyPoint>>> Utils::sift_matches_matrix_e
 				}
 				imwrite("C:/dataset3/im_tgt3.png", im1);
 				imwrite("C:/dataset3/im_src3.png", im2);
-			
-				}
+
+			}
 			//
 			//for (int i = 0; i < best_kpsrc.size(); i++) 
 			//{
@@ -708,7 +709,7 @@ double** Utils::Create2DRandomArray(unsigned int rowCount, unsigned int columnCo
 	std::vector<std::string> imagens_src;
 	std::vector<std::vector<float> > pose = Utils::lerSFM(pasta, fx, fy, cx, cy, imagens_src);*/
 
-	double **array = new double *[rowCount]; //Primeiro individuo é o valor do robô -  
+	double** array = new double* [rowCount]; //Primeiro individuo é o valor do robô -  
 
 #pragma omp parallel for
 	for (int y = 0; y < rowCount; y++)
@@ -741,10 +742,10 @@ double** Utils::Create2DRandomArray(unsigned int rowCount, unsigned int columnCo
 
 }
 
-double** Utils::inicialization(unsigned int rowCount, unsigned int columnCount, double **inicial)
+double** Utils::inicialization(unsigned int rowCount, unsigned int columnCount, double** inicial)
 {
 
-	double **array = new double *[rowCount];
+	double** array = new double* [rowCount];
 
 #pragma omp parallel for
 	for (int y = 0; y < rowCount; y++)
@@ -766,17 +767,17 @@ double** Utils::inicialization(unsigned int rowCount, unsigned int columnCount, 
 }
 // create 1D long double array with value zero
 double* Utils::Create1DZeroArray(unsigned int columnCount) {
-	double *array = new double[columnCount];
+	double* array = new double[columnCount];
 	std::fill_n(array, columnCount, 0.0);
 	return array;
 }
 double* Utils::Create1DArray(unsigned int columnCount) {
-	double *array = new double[columnCount];
+	double* array = new double[columnCount];
 	std::fill_n(array, columnCount, std::numeric_limits<double>::infinity());
 	return array;
 }
 double** Utils::Create2DZeroArray(int search_agents, int dimension) {
-	double **zeros_vector = new double *[search_agents];
+	double** zeros_vector = new double* [search_agents];
 #pragma omp parallel for
 	for (int y = 0; y < search_agents; y++)
 	{
@@ -809,7 +810,7 @@ void Utils::Clip1DArray(double array[], unsigned int columnCount, Boundaries bou
 	}
 }
 
-void Utils::sortArr(double array[], int n, std::vector<int> &Ind_Salp_Ordenado)
+void Utils::sortArr(double array[], int n, std::vector<int>& Ind_Salp_Ordenado)
 {
 	std::vector<std::pair<double, int> > vp;
 	// Inserting element in pair vector
@@ -889,7 +890,7 @@ void Utils::clearResultstxt(std::string pasta)
 
 //Image plots
 
-void Utils::doTheThing(float sd, Eigen::Vector3d p2, Eigen::Vector3d p4, Eigen::Vector3d p5, Eigen::Vector3d pc, cv::Mat im, cv::Mat &img, cv::Mat im360) {
+void Utils::doTheThing(float sd, Eigen::Vector3d p2, Eigen::Vector3d p4, Eigen::Vector3d p5, Eigen::Vector3d pc, cv::Mat im, cv::Mat& img, cv::Mat im360) {
 	// A partir de frustrum, calcular a posicao de cada pixel da imagem fonte em XYZ, assim como quando criavamos o plano do frustrum
 	Eigen::Vector3d hor_step, ver_step; // Steps pra se andar de acordo com a resolucao da imagem
 	hor_step = (p4 - p5) / float(im.cols);
@@ -932,7 +933,7 @@ bool findMinMaxcols(cv::Point const& a, cv::Point const& b)
 {
 	return a.x < b.x;
 }
-cv::Mat Utils::createMask(cv::Mat img, std::vector<std::vector<cv::Point>> contours, int k, int qnt_images_linha, int ind)
+cv::Mat Utils::createMask(cv::Mat img, std::vector<std::vector<cv::Point>> contours, int k, int qnt_images_linha)
 {
 	//verificando os pontos pertencentes ao contorno
 	std::vector<cv::Point> pts;
@@ -1044,7 +1045,7 @@ cv::Mat Utils::createMask(cv::Mat img, std::vector<std::vector<cv::Point>> conto
 				{
 					for (int j = 0; j < img.rows; j++)
 					{
-						if (img.at< cv::Vec3b>(cv::Point(i, j))[0] != 0 && img.at< cv::Vec3b>(cv::Point(i, j))[1] != 0 && img.at< cv::Vec3b>(cv::Point(i, j))[2] != 0) {
+						if (img.at<cv::Vec3b>(cv::Point(i, j))[0] != 0 && img.at< cv::Vec3b>(cv::Point(i, j))[1] != 0 && img.at<cv::Vec3b>(cv::Point(i, j))[2] != 0) {
 
 							cv::Point p;
 							p.x = i; p.y = j;
@@ -1058,7 +1059,7 @@ cv::Mat Utils::createMask(cv::Mat img, std::vector<std::vector<cv::Point>> conto
 
 				int size1 = abs(valH.first->x - valH.second->x);
 #pragma omp parallel for
-				for (int i = valH.first->x; i < valH.first->x + 350; i++)
+				for (int i = valH.first->x; i < valH.first->x + 300; i++)
 				{
 					for (int j = 0; j < img.rows; j++)
 					{
@@ -1068,13 +1069,13 @@ cv::Mat Utils::createMask(cv::Mat img, std::vector<std::vector<cv::Point>> conto
 					}
 				}
 #pragma omp parallel for
-				for (int i = valH.second->x - 350; i < valH.second->x; i++)
+				for (int i = valH.second->x - 300; i < valH.second->x; i++)
 				{
 					for (int j = 0; j < img.rows; j++)
 					{
 
 						cv::Vec3b color1(0, 0, 0);
-						img.at< cv::Vec3b>(cv::Point(i, j)) = color1;
+						img.at<cv::Vec3b>(cv::Point(i, j)) = color1;
 					}
 				}
 			}
@@ -1082,7 +1083,7 @@ cv::Mat Utils::createMask(cv::Mat img, std::vector<std::vector<cv::Point>> conto
 			{
 
 #pragma omp parallel for
-				for (int i = val.first->x; i < val.first->x + 250; i++)
+				for (int i = val.first->x; i < val.first->x + 200; i++)
 				{
 					for (int j = 0; j < img.rows; j++)
 					{
@@ -1092,13 +1093,13 @@ cv::Mat Utils::createMask(cv::Mat img, std::vector<std::vector<cv::Point>> conto
 					}
 				}
 #pragma omp parallel for
-				for (int i = val.second->x - 250; i < val.second->x; i++)
+				for (int i = val.second->x - 200; i < val.second->x; i++)
 				{
 					for (int j = 0; j < img.rows; j++)
 					{
 
 						cv::Vec3b color1(0, 0, 0);
-						img.at< cv::Vec3b>(cv::Point(i, j)) = color1;
+						img.at<cv::Vec3b>(cv::Point(i, j)) = color1;
 					}
 				}
 			}
@@ -1144,7 +1145,7 @@ cv::Mat Utils::createMask(cv::Mat img, std::vector<std::vector<cv::Point>> conto
 						if (img.at< cv::Vec3b>(cv::Point(i, j))[0] != 0 && img.at< cv::Vec3b>(cv::Point(i, j))[1] != 0 && img.at<cv::Vec3b>(cv::Point(i, j))[2] != 0) {
 
 							cv::Vec3b color1(0, 0, 0);
-							img.at<cv::Vec3b>(cv::Point(i, j)) = color1;
+							img.at< cv::Vec3b>(cv::Point(i, j)) = color1;
 						}
 					}
 				}
@@ -1290,7 +1291,7 @@ cv::Mat Utils::multiband_blending(cv::Mat a, const cv::Mat b, int k, int qnt_ima
 
 	//Encontrando a máscara
 	//imwrite("C:/Users/julia/Pictures/geradorartesspace/scan3/dst3.png", dst3);
-	cv::Mat mask_out = Utils::createMask(dst3, contours3, k, qnt_images_linha, ind);
+	cv::Mat mask_out = Utils::createMask(dst3, contours3, k, qnt_images_linha);
 	//imwrite("C:/Users/julia/Pictures/geradorartesspace/scan3/mask_out.png", mask_out);
 	cv::subtract(dst, mask_out, dst);
 	//imwrite("C:/Users/julia/Pictures/geradorartesspace/scan3/mask.png", dst);
@@ -1367,7 +1368,7 @@ cv::Mat Utils::multiband_blending(cv::Mat a, const cv::Mat b, int k, int qnt_ima
 }
 void Utils::dotsFilter(cv::Mat& in) {
 	// Imagem temporaria para servir de fonte, enquanto altera a imagem passada por ponteiro
-	Mat temp;
+	cv::Mat temp;
 	in.copyTo(temp);
 	// Varrer imagem de forma paralela, se achar ponto preto, tirar a media da vizinhanca nxn predefinida e trocar a cor do pixel
 
@@ -1376,11 +1377,8 @@ void Utils::dotsFilter(cv::Mat& in) {
 #pragma omp parallel for
 	for (int u = n + 1; u < temp.cols - n - 1; u++) {
 		for (int v = n + 1; v < temp.rows - n - 1; v++) {
-			Vec3b cor_atual = temp.at<Vec3b>(Point(u, v));
+			cv::Vec3b cor_atual = temp.at<cv::Vec3b>(cv::Point(u, v));
 			// Se preto, alterar com vizinhos
-
-
-
 			if (cor_atual[0] == 0 && cor_atual[1] == 0 && cor_atual[2] == 0)
 			{
 				int r = 0, g = 0, b = 0;
@@ -1388,7 +1386,7 @@ void Utils::dotsFilter(cv::Mat& in) {
 				for (int i = u - n; i < u + n; i++) {
 					for (int j = v - n; j < v + n; j++) {
 
-						Vec3b c = temp.at<Vec3b>(Point(i, j));
+						cv::Vec3b c = temp.at<cv::Vec3b>(cv::Point(i, j));
 						if (c[0] != 0 && c[1] != 0 && c[2] != 0) {
 							r = c[0]; g = c[1]; b = c[2];
 							cont = 1;
@@ -1400,7 +1398,7 @@ void Utils::dotsFilter(cv::Mat& in) {
 				cor_atual[0] = r; cor_atual[1] = g; cor_atual[2] = b;
 
 				//Altera somente na imagem de saida
-				in.at<Vec3b>(Point(u, v)) = cor_atual;
+				in.at<cv::Vec3b>(cv::Point(u, v)) = cor_atual;
 
 			}
 		}
@@ -1445,7 +1443,7 @@ std::vector<cv::Mat> Utils::panoramicas(int dimension, std::string pasta, double
 
 		Eigen::Matrix3d r1;
 
-		r1 = Eigen::AngleAxisd(-DEG2RAD(par[1]), Eigen::Vector3d::UnitY())*Eigen::AngleAxisd(-DEG2RAD(par[0]), Eigen::Vector3d::UnitX())*Eigen::AngleAxisd(-DEG2RAD(0), Eigen::Vector3d::UnitZ());
+		r1 = Eigen::AngleAxisd(-DEG2RAD(par[1]), Eigen::Vector3d::UnitY()) * Eigen::AngleAxisd(-DEG2RAD(par[0]), Eigen::Vector3d::UnitX()) * Eigen::AngleAxisd(-DEG2RAD(0), Eigen::Vector3d::UnitZ());
 		rot[indice_posicao] = r1;
 		foco[indice_posicao] << par[2], par[3];
 
@@ -1568,10 +1566,10 @@ std::vector<cv::Mat> Utils::panoramicas(int dimension, std::string pasta, double
 		double minX, minY, maxX, maxY;
 		double dx = Cs[ind[i]][0] - double(image.cols) / 2, dy = Cs[ind[i]][1] - double(image.rows) / 2;
 		//    double dx = 0, dy = 0;
-		maxX = F * (float(image.cols) - 2 * dx) / (2.0*foco[ind[i]][0]);
-		minX = -F * (float(image.cols) + 2 * dx) / (2.0*foco[ind[i]][0]);
-		maxY = F * (float(image.rows) - 2 * dy) / (2.0*foco[ind[i]][1]);
-		minY = -F * (float(image.rows) + 2 * dy) / (2.0*foco[ind[i]][1]);
+		maxX = F * (float(image.cols) - 2 * dx) / (2.0 * foco[ind[i]][0]);
+		minX = -F * (float(image.cols) + 2 * dx) / (2.0 * foco[ind[i]][0]);
+		maxY = F * (float(image.rows) - 2 * dy) / (2.0 * foco[ind[i]][1]);
+		minY = -F * (float(image.rows) + 2 * dy) / (2.0 * foco[ind[i]][1]);
 		//		// Calcular os 4 pontos do frustrum
 		//		/*
 		//								origin of the camera = p1
@@ -1616,7 +1614,7 @@ std::vector<cv::Mat> Utils::panoramicas(int dimension, std::string pasta, double
 		{
 
 			imagem_esferica.convertTo(imagem_esferica, CV_32F, 1.0 / 255.0);
-			im360_parcial[0] = Utils::multiband_blending(anterior, imagem_esferica, index, qnt_images_linha,i);
+			im360_parcial[0] = Utils::multiband_blending(anterior, imagem_esferica, index, qnt_images_linha, i);
 			anterior = im360_parcial[0];
 			imagem_esferica.release();
 
@@ -1635,7 +1633,7 @@ std::vector<cv::Mat> Utils::panoramicas(int dimension, std::string pasta, double
 
 
 			imagem_esferica.convertTo(imagem_esferica, CV_32F, 1.0 / 255.0);
-			im360_parcial[1] = Utils::multiband_blending(anterior, imagem_esferica, index, qnt_images_linha,i);
+			im360_parcial[1] = Utils::multiband_blending(anterior, imagem_esferica, index, qnt_images_linha, i);
 			anterior = im360_parcial[1];
 			imagem_esferica.release();
 			//imwrite(pasta + "imagem_esferica_Blending.png", im360_parcial[1] * 255);
@@ -1655,7 +1653,7 @@ std::vector<cv::Mat> Utils::panoramicas(int dimension, std::string pasta, double
 
 
 			imagem_esferica.convertTo(imagem_esferica, CV_32F, 1.0 / 255.0);
-			im360_parcial[2] = Utils::multiband_blending(anterior, imagem_esferica, index, qnt_images_linha,i);
+			im360_parcial[2] = Utils::multiband_blending(anterior, imagem_esferica, index, qnt_images_linha, i);
 			anterior = im360_parcial[2];
 			//	imwrite(pasta + "imagem_esferica_Blending.png", im360_parcial[2] * 255);
 			imagem_esferica.release();
@@ -1674,7 +1672,7 @@ std::vector<cv::Mat> Utils::panoramicas(int dimension, std::string pasta, double
 		{
 
 			imagem_esferica.convertTo(imagem_esferica, CV_32F, 1.0 / 255.0);
-			im360_parcial[3] = Utils::multiband_blending(anterior, imagem_esferica, index, qnt_images_linha,i);
+			im360_parcial[3] = Utils::multiband_blending(anterior, imagem_esferica, index, qnt_images_linha, i);
 			anterior = im360_parcial[3];
 			imagem_esferica.release();
 			//imwrite(pasta + "imagem_esferica_Blending.png", im360_parcial[3] * 255);
@@ -1692,7 +1690,7 @@ std::vector<cv::Mat> Utils::panoramicas(int dimension, std::string pasta, double
 		{
 
 			imagem_esferica.convertTo(imagem_esferica, CV_32F, 1.0 / 255.0);
-			im360_parcial[4] = Utils::multiband_blending(anterior, imagem_esferica, index, qnt_images_linha,i);
+			im360_parcial[4] = Utils::multiband_blending(anterior, imagem_esferica, index, qnt_images_linha, i);
 			anterior = im360_parcial[4];
 			//	imwrite(pasta + "imagem_esferica_Blending.png", im360_parcial[4] * 255);
 			imagem_esferica.release();
@@ -1710,7 +1708,7 @@ std::vector<cv::Mat> Utils::panoramicas(int dimension, std::string pasta, double
 		{
 
 			imagem_esferica.convertTo(imagem_esferica, CV_32F, 1.0 / 255.0);
-			im360_parcial[5] = Utils::multiband_blending(anterior, imagem_esferica, index, qnt_images_linha,i);
+			im360_parcial[5] = Utils::multiband_blending(anterior, imagem_esferica, index, qnt_images_linha, i);
 			anterior = im360_parcial[5];
 			//	imwrite(pasta + "imagem_esferica_Blending.png", im360_parcial[5] * 255);
 			imagem_esferica.release();
@@ -1728,7 +1726,7 @@ std::vector<cv::Mat> Utils::panoramicas(int dimension, std::string pasta, double
 		{
 
 			imagem_esferica.convertTo(imagem_esferica, CV_32F, 1.0 / 255.0);
-			im360_parcial[6] = Utils::multiband_blending(anterior, imagem_esferica, index, qnt_images_linha,i);
+			im360_parcial[6] = Utils::multiband_blending(anterior, imagem_esferica, index, qnt_images_linha, i);
 			anterior = im360_parcial[6];
 			//	imwrite(pasta + "imagem_esferica_Blending.png", im360_parcial[6] * 255);
 			imagem_esferica.release();
@@ -1746,7 +1744,7 @@ std::vector<cv::Mat> Utils::panoramicas(int dimension, std::string pasta, double
 		{
 
 			imagem_esferica.convertTo(imagem_esferica, CV_32F, 1.0 / 255.0);
-			im360_parcial[7] = Utils::multiband_blending(anterior, imagem_esferica, index, qnt_images_linha,i);
+			im360_parcial[7] = Utils::multiband_blending(anterior, imagem_esferica, index, qnt_images_linha, i);
 			anterior = im360_parcial[7];
 			//	imwrite(pasta + "imagem_esferica_Blending.png", im360_parcial[6] * 255);
 			imagem_esferica.release();
@@ -1762,7 +1760,7 @@ std::vector<cv::Mat> Utils::panoramicas(int dimension, std::string pasta, double
 	result = im360_parcial[7];
 	for (int i = 7; i > 0; i--) {
 
-		result = Utils::multiband_blending(result, im360_parcial[i - 1], index, qnt_images_linha,i);
+		result = Utils::multiband_blending(result, im360_parcial[i - 1], index, qnt_images_linha, i);
 	}
 	result.convertTo(result, CV_8UC3, 255);
 #pragma omp parallel for
