@@ -8,6 +8,6 @@ Os algoritmos implementados no momento são:
 * Salp Swarm Algorithm (SSA)
 * Particle Swarm Optimization (PSO)
 
-As imagens para serem usadas como exemplos estão disponíveis [aqui](https://github.com/mariajuliagrin/Bundle-Adjustment-Metaheuristicas/releases/tag/0.1).
+As imagens para serem usadas como exemplos estão disponíveis [aqui](https://github.com/mariajuliagrin/Bundle-Adjustment-Metaheuristicas/releases/tag/0.2).
 
 
