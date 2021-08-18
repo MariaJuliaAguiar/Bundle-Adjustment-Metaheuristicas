@@ -33,7 +33,7 @@ std::vector<std::vector<float>>  Utils::lerSFM(std::string pasta, double& fx, do
 	//std::fstream conv;
 	std::ofstream conv;
 	conv.open(pasta + "original.sfm", std::ofstream::out | std::ofstream::trunc);
-	conv << linhas.size() << "\n";
+	conv << linhas.size() << "\n"<<"\n";
 	//conv.open(pasta+"original.sfm");
 	for (int i = 0; i < linhas.size(); i++) {
 		std::istringstream iss(linhas[i]);

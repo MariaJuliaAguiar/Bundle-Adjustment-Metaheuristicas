@@ -63,7 +63,7 @@ void freeMemoryOti() {
 }
 int main() {
 	//Localização do arquivo NVM/SFM com posição das imagens de acordo com o PEPO
-	std::string pasta = "C:/Users/julia/Pictures/quintal35/scan1-20210225T171058Z-001/scan1/";
+	std::string pasta = "C:/Users/julia/Desktop/dataset/scan36/";
 
 	//Encontrando posição originais das imagens (Posição do PEPO)
 	double fx, fy, cx, cy;
