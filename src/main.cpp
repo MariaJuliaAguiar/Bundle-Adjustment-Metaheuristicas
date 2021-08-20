@@ -63,7 +63,7 @@ void freeMemoryOti() {
 }
 int main() {
 	//Localização do arquivo NVM/SFM com posição das imagens de acordo com o PEPO
-	std::string pasta = "C:/Users/julia/Desktop/dataset/scan36/";
+	std::string pasta = "C:/Users/julia/Desktop/dataset/scan21/";
 
 	//Encontrando posição originais das imagens (Posição do PEPO)
 	double fx, fy, cx, cy;
@@ -334,29 +334,32 @@ int main() {
 	std::vector<cv::Mat> im360_GWO = Utils::panoramicas(dimension_m, pasta, Best_pos_GWO[index_GWO]);
 	cv::imwrite(pasta + "im360_GWO.png", im360_GWO[0]);
 	cv::imwrite(pasta + "im360_GWO_blending.png", im360_GWO[1]);
-
+	im360_GWO.clear();
+	
 	std::cout << "BAT - ";
 	auto it_BAT = std::min_element(Best_sol_BAT, Best_sol_BAT + simulations);
 	int index_BAT = std::distance(Best_sol_BAT, it_BAT);
+	
 	std::vector<cv::Mat> im360_BAT = Utils::panoramicas(dimension_m, pasta, Best_pos_BAT[index_BAT]);
 	cv::imwrite(pasta + "im360_BAT.png", im360_BAT[0]);
 	cv::imwrite(pasta + "im360_BAT_blending.png", im360_BAT[1]);
-
+	im360_BAT.clear();
+	
 	std::cout << "AOA - ";
 	auto it_AOA = std::min_element(Best_sol_AOA, Best_sol_AOA + simulations);
 	int index_AOA = std::distance(Best_sol_AOA, it_AOA);
 	std::vector<cv::Mat> im360_AOA = Utils::panoramicas(dimension_m, pasta, Best_pos_AOA[index_AOA]);
 	cv::imwrite(pasta + "im360_AOA.png", im360_AOA[0]);
 	cv::imwrite(pasta + "im360_AOA_blending.png", im360_AOA[1]);
-
+	im360_AOA.clear();
+	
 	std::cout << "SSA - ";
 	auto it_SSA = std::min_element(Best_sol_SSA, Best_sol_SSA + simulations);
 	int index_SSA = std::distance(Best_sol_SSA, it_SSA);
 	std::vector<cv::Mat> im360_SSA = Utils::panoramicas(dimension_m, pasta, Best_pos_SSA[index_SSA]);
 	cv::imwrite(pasta + "im360_SSA.png", im360_SSA[0]);
 	cv::imwrite(pasta + "im360_SSA_blending.png", im360_SSA[1]);
-
-	freeMemoryOti();
+	im360_SSA.clear();
 
 	std::cout << "PSO - ";
 	auto it_PSO = std::min_element(Best_sol_PSO, Best_sol_PSO + simulations);
@@ -364,7 +367,7 @@ int main() {
 	std::vector<cv::Mat> im360_PSO = Utils::panoramicas(dimension_m, pasta, Best_pos_PSO[index_PSO]);
 	cv::imwrite(pasta + "im360_PSO.png", im360_PSO[0]);
 	cv::imwrite(pasta + "im360_PSO_blending.png", im360_PSO[1]);
-
+	im360_PSO.clear();
 	freeMemoryOti();
 
 	std::cout << " Processo Finalizado";

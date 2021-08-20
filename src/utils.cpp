@@ -1298,8 +1298,11 @@ cv::Mat Utils::multiband_blending(cv::Mat a, const cv::Mat b, int k, int qnt_ima
 	dst.convertTo(dst, CV_32FC3, 1.0 / 255.0);
 
 	mask[0] = dst;
-
-
+	contours.clear();
+	contours3.clear();
+	dst.release();
+	dst3.release();
+	
 	//Filtro Gaussiano e o resultado é uma imagem reduzida com a metade do tamanho de cada dimensão
 
 	for (int i = 1; i < level_num; ++i)
@@ -1774,6 +1777,9 @@ std::vector<cv::Mat> Utils::panoramicas(int dimension, std::string pasta, double
 	std::vector<cv::Mat> images_res;
 	images_res.push_back(im360);
 	images_res.push_back(result);
+	im360.release();
+	result.release();
+	im360_parcial.clear();
 	return images_res;
 
 
